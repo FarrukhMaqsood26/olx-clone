@@ -5,25 +5,21 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
--- --------------------------------------------------------
--- Table structure for table `users`
--- --------------------------------------------------------
+
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL UNIQUE,
   `password` varchar(255) NOT NULL,
   `phone` varchar(20) DEFAULT NULL,
-  `is_phone_verified` boolean DEFAULT false,
-  `otp_code` varchar(10) DEFAULT NULL,
+  `is_email_verified` boolean DEFAULT false,
+  `email_verification_token` varchar(100) DEFAULT NULL,
   `avatar` varchar(255) DEFAULT 'default.png',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
--- Table structure for table `categories`
--- --------------------------------------------------------
+
 CREATE TABLE `categories` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
@@ -32,9 +28,6 @@ CREATE TABLE `categories` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
--- Table structure for table `ads`
--- --------------------------------------------------------
 CREATE TABLE `ads` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -51,9 +44,6 @@ CREATE TABLE `ads` (
   FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
--- Table structure for table `ad_images`
--- --------------------------------------------------------
 CREATE TABLE `ad_images` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ad_id` int(11) NOT NULL,
@@ -63,9 +53,22 @@ CREATE TABLE `ad_images` (
   FOREIGN KEY (`ad_id`) REFERENCES `ads`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
--- Table structure for table `favorites`
--- --------------------------------------------------------
+CREATE TABLE `messages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sender_id` int(11) NOT NULL,
+  `receiver_id` int(11) NOT NULL,
+  `ad_id` int(11) DEFAULT NULL,
+  `content` text DEFAULT NULL,
+  `file_path` varchar(255) DEFAULT NULL,
+  `file_type` varchar(50) DEFAULT 'text',
+  `is_read` boolean DEFAULT false,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`sender_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`receiver_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`ad_id`) REFERENCES `ads`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE `favorites` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -76,9 +79,7 @@ CREATE TABLE `favorites` (
   FOREIGN KEY (`ad_id`) REFERENCES `ads`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
--- Table structure for table `password_resets`
--- --------------------------------------------------------
+
 CREATE TABLE `password_resets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(100) NOT NULL,
@@ -87,9 +88,6 @@ CREATE TABLE `password_resets` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
--- Sample Data Insertions
--- --------------------------------------------------------
 INSERT INTO `categories` (`name`, `slug`, `icon`) VALUES
 ('Mobiles', 'mobiles', 'fa-mobile-alt'),
 ('Vehicles', 'vehicles', 'fa-car'),

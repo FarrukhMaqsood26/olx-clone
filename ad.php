@@ -20,12 +20,16 @@ $ad = $stmt->fetch();
 
 if (!$ad) {
     include 'includes/header.php';
-    echo '<main><div class="glass-panel" style="max-width:600px; margin:80px auto; padding:60px; text-align:center; border-radius:var(--radius-xl);">
-        <i class="fas fa-search" style="font-size:56px; color:var(--glass-border); margin-bottom:20px;"></i>
-        <h2 style="margin-bottom:10px;">Ad Not Found</h2>
-        <p style="color:var(--text-secondary); margin-bottom:25px;">This ad may have been removed or is no longer available.</p>
-        <a href="index.php" class="btn-sell"><i class="fas fa-home"></i> Back to Home</a>
-    </div></main>';
+    echo '<main class="flex-grow flex items-center justify-center p-4">
+        <div class="bg-white border border-slate-200 border-dashed rounded-2xl max-w-lg w-full p-12 text-center shadow-sm">
+            <i class="fas fa-search text-5xl text-slate-300 mb-6 tracking-tight"></i>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Ad Not Found</h2>
+            <p class="text-slate-500 mb-8">This ad may have been removed or is no longer available.</p>
+            <a href="index.php" class="inline-flex items-center gap-2 bg-brand hover:bg-brand-light text-white font-bold py-3 px-8 rounded-full transition shadow-sm">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+    </main>';
     include 'includes/footer.php';
     exit;
 }
@@ -49,298 +53,158 @@ $similarAds = $similarStmt->fetchAll();
 include 'includes/header.php'; 
 ?>
 
-<style>
-.ad-detail-container {
-    max-width: 1200px;
-    margin: 30px auto;
-    display: grid;
-    grid-template-columns: 1.6fr 1fr;
-    gap: 25px;
-    animation: fadeInUp 0.5s ease;
-}
-
-.ad-gallery {
-    position: relative;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-}
-
-.ad-gallery img {
-    width: 100%;
-    border-radius: var(--radius-lg);
-    object-fit: cover;
-    max-height: 480px;
-    transition: transform 0.5s ease;
-    cursor: zoom-in;
-}
-
-.ad-gallery:hover img {
-    transform: scale(1.02);
-}
-
-.ad-thumb-strip {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.ad-thumb-strip img {
-    width: 80px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: all var(--transition-fast);
-    opacity: 0.7;
-}
-
-.ad-thumb-strip img:hover,
-.ad-thumb-strip img.active {
-    border-color: var(--accent-cyan);
-    opacity: 1;
-}
-
-.ad-info h1 {
-    color: var(--primary-teal);
-    margin-bottom: 8px;
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 1.3;
-}
-
-.ad-price-tag {
-    font-size: 34px;
-    font-weight: 800;
-    margin-bottom: 16px;
-    background: linear-gradient(135deg, var(--primary-teal), #004d56);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.ad-meta-row {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 12px;
-    font-size: 14px;
-    color: var(--text-secondary);
-}
-
-.ad-meta-row i {
-    color: var(--accent-cyan);
-    width: 18px;
-    text-align: center;
-    margin-right: 5px;
-}
-
-.seller-card {
-    margin-top: 25px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 18px;
-    background: rgba(255,255,255,0.4);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--glass-border);
-}
-
-.seller-avatar {
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    color: white;
-    flex-shrink: 0;
-}
-
-.sold-overlay {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: rgba(139, 92, 246, 0.9);
-    color: white;
-    padding: 8px 20px;
-    border-radius: var(--radius-full);
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 1px;
-    z-index: 5;
-}
-
-.desc-section {
-    padding: 28px;
-    margin-top: 25px;
-    border-radius: var(--radius-xl);
-}
-
-.desc-section h3 {
-    margin-bottom: 15px;
-    color: var(--primary-teal);
-    font-size: 18px;
-    font-weight: 700;
-}
-
-.desc-section p {
-    color: var(--text-secondary);
-    line-height: 1.7;
-    white-space: pre-wrap;
-    font-size: 15px;
-}
-
-/* Similar ads section */
-.similar-section {
-    margin-top: 50px;
-    grid-column: 1 / -1;
-}
-</style>
-
-<main>
-    <div class="ad-detail-container">
+<main class="flex-grow py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-8 items-start">
+        
         <!-- Left: Images and Details -->
-        <div class="ad-left">
-            <div class="glass-panel" style="padding: 20px; border-radius: var(--radius-xl);">
-                <div class="ad-gallery">
-                    <?php if($ad['status'] === 'sold'): ?>
-                        <div class="sold-overlay">SOLD</div>
-                    <?php endif; ?>
+        <div class="space-y-8 min-w-0">
+            <div class="bg-black border border-slate-200 rounded-2xl overflow-hidden shadow-sm relative group">
+                <?php if($ad['status'] === 'sold'): ?>
+                    <div class="absolute top-4 left-4 bg-purple-600 text-white px-4 py-1.5 rounded-full font-bold text-sm tracking-wider z-20 shadow-md">SOLD</div>
+                <?php endif; ?>
+                
+                <div class="relative aspect-[4/3] sm:aspect-[16/9] w-full bg-slate-900 flex items-center justify-center overflow-hidden">
                     <?php if (count($images) > 0): ?>
-                        <img src="<?= htmlspecialchars($images[0]['image_path']) ?>" alt="<?= htmlspecialchars($ad['title']) ?>" id="mainAdImage">
+                        <img src="<?= htmlspecialchars($images[0]['image_path']) ?>" alt="<?= htmlspecialchars($ad['title']) ?>" id="mainAdImage" class="w-full h-full object-contain cursor-zoom-in transition-transform duration-500 hover:scale-105">
                     <?php else: ?>
-                        <div style="height:350px; background:linear-gradient(135deg, #f8fafc, #e2e8f0); border-radius:var(--radius-lg); display:flex; align-items:center; justify-content:center; color:#94a3b8;">
-                            <div style="text-align:center;">
-                                <i class="fas fa-image" style="font-size:48px; margin-bottom:10px;"></i>
-                                <p>No Image Available</p>
-                            </div>
+                        <div class="text-center text-slate-500">
+                            <i class="fas fa-image text-6xl mb-4 opacity-50"></i>
+                            <p class="font-medium">No Image Available</p>
                         </div>
                     <?php endif; ?>
                 </div>
-                
-                <?php if(count($images) > 1): ?>
-                <div class="ad-thumb-strip">
-                    <?php foreach($images as $i => $img): ?>
-                        <img src="<?= htmlspecialchars($img['image_path']) ?>" 
-                             alt="Thumbnail <?= $i+1 ?>"
-                             class="<?= $i === 0 ? 'active' : '' ?>"
-                             onclick="changeMainImage(this, '<?= htmlspecialchars($img['image_path']) ?>')">
-                    <?php endforeach; ?>
-                </div>
-                <?php endif; ?>
             </div>
             
-            <div class="desc-section glass-panel">
-                <h3><i class="fas fa-align-left" style="margin-right:8px; color:var(--accent-cyan);"></i> Description</h3>
-                <p><?= nl2br(htmlspecialchars($ad['description'])) ?></p>
+            <?php if(count($images) > 1): ?>
+            <div class="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+                <?php foreach($images as $i => $img): ?>
+                    <button class="flex-none snap-start focus:outline-none" onclick="changeMainImage(this, '<?= htmlspecialchars($img['image_path']) ?>')">
+                        <img src="<?= htmlspecialchars($img['image_path']) ?>" alt="Thumbnail <?= $i+1 ?>" class="ad-thumb cursor-pointer w-20 h-16 sm:w-24 sm:h-20 object-cover rounded-lg border-2 <?= $i === 0 ? 'border-brand opacity-100 shadow-sm' : 'border-transparent opacity-60 hover:opacity-100 hover:border-slate-300' ?> transition">
+                    </button>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+            
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-8">
+                <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2 mb-4 border-b border-slate-100 pb-4">
+                    <i class="fas fa-align-left text-brand"></i> Description
+                </h3>
+                <div class="prose prose-slate max-w-none text-slate-600 whitespace-pre-wrap leading-relaxed text-[15px]"><?= htmlspecialchars($ad['description']) ?></div>
             </div>
             
-            <div class="desc-section glass-panel" style="margin-top:15px;">
-                <h3><i class="fas fa-info-circle" style="margin-right:8px; color:var(--accent-cyan);"></i> Details</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
-                    <div style="padding:12px; background:rgba(255,255,255,0.4); border-radius:var(--radius-sm);">
-                        <span style="font-size:12px; color:var(--text-secondary); display:block;">Condition</span>
-                        <span style="font-weight:600; text-transform:capitalize;"><?= $ad['condition_type'] ?></span>
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-8">
+                <h3 class="text-xl font-bold text-slate-900 flex items-center gap-2 mb-4 border-b border-slate-100 pb-4">
+                    <i class="fas fa-info-circle text-brand"></i> Details
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col gap-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Condition</span>
+                        <span class="font-bold text-slate-800 capitalize"><?= $ad['condition_type'] ?></span>
                     </div>
                     <?php if($ad['category_name']): ?>
-                    <div style="padding:12px; background:rgba(255,255,255,0.4); border-radius:var(--radius-sm);">
-                        <span style="font-size:12px; color:var(--text-secondary); display:block;">Category</span>
-                        <span style="font-weight:600;"><?= htmlspecialchars($ad['category_name']) ?></span>
+                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col gap-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</span>
+                        <span class="font-bold text-slate-800 truncate"><?= htmlspecialchars($ad['category_name']) ?></span>
                     </div>
                     <?php endif; ?>
-                    <div style="padding:12px; background:rgba(255,255,255,0.4); border-radius:var(--radius-sm);">
-                        <span style="font-size:12px; color:var(--text-secondary); display:block;">Location</span>
-                        <span style="font-weight:600;"><?= htmlspecialchars($ad['location']) ?></span>
+                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col gap-1 col-span-2 md:col-span-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Location</span>
+                        <span class="font-bold text-slate-800 truncate"><?= htmlspecialchars($ad['location']) ?></span>
                     </div>
-                    <div style="padding:12px; background:rgba(255,255,255,0.4); border-radius:var(--radius-sm);">
-                        <span style="font-size:12px; color:var(--text-secondary); display:block;">Posted</span>
-                        <span style="font-weight:600;"><?= date('M d, Y', strtotime($ad['created_at'])) ?></span>
+                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col gap-1 col-span-2 md:col-span-1">
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Posted</span>
+                        <span class="font-bold text-slate-800"><?= date('M d, Y', strtotime($ad['created_at'])) ?></span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Right: Price and Seller Info -->
-        <div class="ad-right">
-            <div class="glass-panel" style="padding: 28px; position: sticky; top: 90px; border-radius: var(--radius-xl);">
-                <div class="ad-price-tag">Rs <?= number_format($ad['price']) ?></div>
-                <h1><?= htmlspecialchars($ad['title']) ?></h1>
+        <div class="lg:sticky lg:top-24 space-y-6">
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 sm:p-8">
+                <div class="text-4xl font-extrabold text-brand mb-4">Rs <?= number_format($ad['price']) ?></div>
+                <h1 class="text-2xl font-bold text-slate-900 leading-tight mb-4"><?= htmlspecialchars($ad['title']) ?></h1>
                 
-                <div class="ad-meta-row" style="margin-top:15px;">
-                    <span><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($ad['location']) ?></span>
-                    <span><i class="far fa-clock"></i> <?= date('M d, Y', strtotime($ad['created_at'])) ?></span>
+                <div class="flex flex-wrap gap-4 text-sm font-medium text-slate-500 mb-6">
+                    <span class="flex items-center gap-1.5"><i class="fas fa-map-marker-alt text-slate-400"></i> <?= htmlspecialchars($ad['location']) ?></span>
+                    <span class="flex items-center gap-1.5"><i class="far fa-clock text-slate-400"></i> <?= date('M d, Y', strtotime($ad['created_at'])) ?></span>
                 </div>
                 
-                <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 20px 0;">
+                <div class="h-px w-full bg-slate-100 mb-6"></div>
                 
-                <div class="seller-card">
-                    <div class="seller-avatar">
-                        <i class="fas fa-user"></i>
+                <div class="flex items-center gap-4 bg-slate-50 border border-slate-100 rounded-xl p-4 mb-6">
+                    <div class="w-14 h-14 rounded-full bg-brand/10 text-brand flex items-center justify-center shrink-0">
+                        <i class="fas fa-user text-2xl"></i>
                     </div>
                     <div>
-                        <div style="font-weight: 600; font-size: 17px;"><?= htmlspecialchars(explode(' ', trim($ad['seller_name']))[0]) ?></div>
-                        <div style="font-size: 13px; color: var(--text-secondary);">Member since <?= date('M Y', strtotime($ad['member_since'])) ?></div>
+                        <div class="font-bold text-slate-900 text-lg"><?= htmlspecialchars(explode(' ', trim($ad['seller_name']))[0]) ?></div>
+                        <div class="text-xs font-semibold text-slate-500">Member since <?= date('M Y', strtotime($ad['member_since'])) ?></div>
                     </div>
                 </div>
 
-                <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
+                <div class="space-y-3">
                     <?php if(isset($_SESSION['user_id'])): ?>
                         <?php if($_SESSION['user_id'] != $ad['user_id']): ?>
-                            <a href="chat.php?partner_id=<?= $ad['user_id'] ?>" class="btn-sell" style="width: 100%; border-radius: var(--radius-md); text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px; padding: 14px;" id="msg-seller-btn">
+                            <a href="chat.php?partner_id=<?= $ad['user_id'] ?>" class="flex items-center justify-center gap-2 w-full bg-brand hover:bg-brand-light text-white font-bold py-3.5 px-4 rounded-xl shadow-sm transition">
                                 <i class="far fa-envelope"></i> Message Seller
                             </a>
                         <?php else: ?>
-                            <div style="background: rgba(35, 229, 219, 0.08); padding: 16px; border-radius: var(--radius-md); text-align:center; color: var(--primary-teal); font-weight:500;">
-                                <i class="fas fa-info-circle"></i> This is your ad
+                            <div class="text-center font-semibold text-brand bg-brand/5 rounded-xl p-3 mb-3 border border-brand/10">
+                                <i class="fas fa-info-circle mr-1"></i> This is your ad
                             </div>
-                            <a href="profile.php" class="ad-action-btn btn-edit" style="justify-content:center; padding:12px; font-size:14px; text-decoration:none;">
+                            <a href="profile.php" class="flex items-center justify-center gap-2 w-full bg-white border border-slate-300 hover:border-brand text-slate-700 hover:text-brand font-bold py-3 px-4 rounded-xl transition shadow-sm">
                                 <i class="fas fa-cog"></i> Manage in Profile
                             </a>
                         <?php endif; ?>
                     <?php else: ?>
-                        <a href="login.php" class="btn-sell" style="width: 100%; margin:0; text-decoration: none; display:flex; text-align:center; justify-content:center; gap:8px; border-radius: var(--radius-md); padding:14px;">
+                        <a href="login.php" class="flex items-center justify-center gap-2 w-full bg-white border-2 border-slate-200 hover:border-brand hover:text-brand text-slate-700 font-bold py-3.5 px-4 rounded-xl transition shadow-sm">
                             <i class="far fa-envelope"></i> Login to Message
                         </a>
                     <?php endif; ?>
                     
                     <?php if($ad['phone']): ?>
-                    <div style="background: rgba(255,255,255,0.6); border: 1px solid var(--glass-border); padding: 14px 18px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display:flex; align-items:center; gap: 10px; font-weight:600; font-size:16px;">
-                            <i class="fas fa-phone" style="color:var(--success);"></i> 
-                            <span><?= htmlspecialchars($ad['phone']) ?></span>
+                    <div class="flex items-center justify-between bg-white border border-slate-200 rounded-xl p-3.5">
+                        <div class="flex items-center gap-3 font-bold text-slate-800">
+                            <i class="fas fa-phone text-emerald-500 bg-emerald-50 w-8 h-8 rounded-full flex items-center justify-center text-sm"></i> 
+                            <?= htmlspecialchars($ad['phone']) ?>
                         </div>
-                        <button onclick="navigator.clipboard.writeText('<?= htmlspecialchars($ad['phone']) ?>'); showToast('Number copied!', 'success');" style="background:none; border:none; color:var(--accent-blue); cursor:pointer; padding:5px; font-weight:600; font-family:inherit;" title="Copy Number">
-                            <i class="far fa-copy"></i> Copy
+                        <button onclick="navigator.clipboard.writeText('<?= htmlspecialchars($ad['phone']) ?>'); showToast('Number copied!', 'success');" class="text-sm font-bold text-accent hover:text-brand transition px-2">
+                            Copy
                         </button>
                     </div>
                     <?php endif; ?>
                     
-                    <button class="favorite-btn" style="position:relative; width:100%; height:auto; border-radius:var(--radius-md); padding:12px; display:flex; align-items:center; justify-content:center; gap:8px; background:rgba(255,255,255,0.5); border:1px solid var(--glass-border); font-family:inherit; font-size:14px; font-weight:600;">
-                        <i class="far fa-heart"></i> Add to Favorites
+                    <button class="flex items-center justify-center gap-2 w-full bg-white border border-slate-200 hover:border-red-500 hover:text-red-500 hover:bg-red-50 text-slate-600 font-bold py-3.5 px-4 rounded-xl transition shadow-sm group">
+                        <i class="far fa-heart group-hover:text-red-500 transition"></i> Add to Favorites
                     </button>
                 </div>
+            </div>
+            
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 text-center text-sm text-slate-500">
+                <i class="fas fa-shield-alt text-brand text-2xl mb-3 block"></i>
+                <p>Stay safe. Meet in a public place and inspect the item before paying.</p>
             </div>
         </div>
 
         <!-- Similar Ads -->
         <?php if(count($similarAds) > 0): ?>
-        <div class="similar-section">
-            <div class="section-header">
-                <h2>Similar Ads</h2>
-            </div>
-            <div class="product-grid">
+        <div class="col-span-1 lg:col-span-2 pt-8 border-t border-slate-200 mt-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Similar Ads</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                 <?php foreach($similarAds as $sim): ?>
-                    <a href="ad.php?id=<?= $sim['id'] ?>" class="product-card glass-panel" style="display:block; color:inherit; text-decoration:none;">
-                        <button class="favorite-btn" onclick="event.preventDefault();"><i class="far fa-heart"></i></button>
+                    <a href="ad.php?id=<?= $sim['id'] ?>" class="group bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col relative block">
+                        <button class="absolute top-3 right-3 bg-white/90 backdrop-blur text-slate-400 w-9 h-9 rounded-full flex items-center justify-center shadow-sm hover:text-red-500 z-10 transition">
+                            <i class="far fa-heart text-lg"></i>
+                        </button>
                         <?php $img = $sim['main_image'] ?: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=500&q=60'; ?>
-                        <img src="<?= htmlspecialchars($img) ?>" alt="Ad" class="product-img">
-                        <div class="product-info">
-                            <div class="product-price">Rs <?= number_format($sim['price']) ?></div>
-                            <div class="product-title"><?= htmlspecialchars($sim['title']) ?></div>
-                            <div class="product-meta">
-                                <span><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($sim['location']) ?></span>
+                        <div class="aspect-[4/3] overflow-hidden border-b border-slate-100">
+                            <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($sim['title']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
+                        </div>
+                        <div class="p-4 flex flex-col flex-1">
+                            <div class="text-xl font-bold text-slate-900 mb-1">Rs <?= number_format($sim['price']) ?></div>
+                            <div class="text-sm text-slate-600 line-clamp-2 mb-4 flex-1 leading-snug"><?= htmlspecialchars($sim['title']) ?></div>
+                            <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide flex justify-between items-center mt-auto">
+                                <span class="flex items-center gap-1 truncate max-w-[80%]"><i class="fas fa-map-marker-alt text-brand"></i> <?= htmlspecialchars($sim['location']) ?></span>
                             </div>
                         </div>
                     </a>
@@ -352,10 +216,16 @@ include 'includes/header.php';
 </main>
 
 <script>
-function changeMainImage(thumb, src) {
-    $('#mainAdImage').attr('src', src);
-    $('.ad-thumb-strip img').removeClass('active');
-    $(thumb).addClass('active');
+function changeMainImage(btn, src) {
+    document.getElementById('mainAdImage').src = src;
+    
+    // Reset all thumbnails
+    document.querySelectorAll('.ad-thumb').forEach(thumb => {
+        thumb.className = 'ad-thumb cursor-pointer w-20 h-16 sm:w-24 sm:h-20 object-cover rounded-lg border-2 border-transparent opacity-60 hover:opacity-100 hover:border-slate-300 transition';
+    });
+    
+    // Set active
+    btn.querySelector('img').className = 'ad-thumb cursor-pointer w-20 h-16 sm:w-24 sm:h-20 object-cover rounded-lg border-2 border-brand opacity-100 shadow-sm transition';
 }
 </script>
 

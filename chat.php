@@ -9,262 +9,93 @@ if (!isset($_SESSION['user_id'])) {
 include 'includes/header.php'; 
 ?>
 
-<style>
-.chat-app-container {
-    max-width: 1200px;
-    margin: 20px auto;
-    height: 80vh;
-    display: flex;
-    gap: 0;
-    overflow: hidden;
-    border-radius: 20px;
-}
-
-/* Sidebar Styling */
-.chat-sidebar {
-    width: 350px;
-    background: rgba(255, 255, 255, 0.4);
-    border-right: 1px solid var(--glass-border);
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar-header {
-    padding: 20px;
-    border-bottom: 1px solid var(--glass-border);
-    font-weight: 700;
-    color: var(--primary-teal);
-    font-size: 20px;
-}
-
-.conversation-list {
-    flex: 1;
-    overflow-y: auto;
-}
-
-.conv-item {
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    cursor: pointer;
-    transition: background 0.2s;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.conv-item:hover { background: rgba(255, 255, 255, 0.3); }
-.conv-item.active { background: rgba(0, 47, 52, 0.1); border-left: 4px solid var(--primary-teal); }
-
-.conv-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: #ddd;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    color: white;
-}
-
-.conv-info { flex: 1; overflow: hidden; }
-.conv-name { font-weight: 600; color: var(--text-primary); }
-.conv-snippet { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-/* Main Chat Area */
-.chat-main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.chat-header {
-    padding: 15px 25px;
-    background: rgba(255, 255, 255, 0.5);
-    border-bottom: 1px solid var(--glass-border);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.chat-thread {
-    flex: 1;
-    padding: 25px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
-}
-
-/* Bubbles */
-.bubble {
-    max-width: 70%;
-    padding: 12px 18px;
-    border-radius: 18px;
-    position: relative;
-    font-size: 15px;
-    line-height: 1.4;
-    word-wrap: break-word;
-}
-
-.bubble.sent {
-    align-self: flex-end;
-    background: var(--primary-teal);
-    color: white;
-    border-bottom-right-radius: 4px;
-}
-
-.bubble.received {
-    align-self: flex-start;
-    background: white;
-    color: #333;
-    border-bottom-left-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.bubble-time {
-    display: block;
-    font-size: 10px;
-    margin-top: 5px;
-    opacity: 0.7;
-    text-align: right;
-}
-
-.chat-attachment {
-    max-width: 100%;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    display: block;
-}
-
-/* Input Area */
-.chat-input-bar {
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.6);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-}
-
-.chat-input-bar input[type="text"] {
-    flex: 1;
-    padding: 12px 20px;
-    border-radius: 25px;
-    border: 1px solid var(--glass-border);
-    background: white;
-    outline: none;
-}
-
-.attach-btn, .mic-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: none;
-    cursor: pointer;
-    color: var(--primary-teal);
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.2s;
-}
-.attach-btn:hover, .mic-btn:hover { background: rgba(0,0,0,0.05); }
-
-.recording-status {
-    position: absolute;
-    left: 80px;
-    right: 80px;
-    background: #fff;
-    padding: 12px 20px;
-    border-radius: 25px;
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    color: #ff4c4c;
-    font-weight: 600;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.pulse {
-    width: 12px;
-    height: 12px;
-    background: #ff4c4c;
-    border-radius: 50%;
-    animation: flash 1s infinite;
-}
-
-@keyframes flash {
-    0% { opacity: 1; }
-    50% { opacity: 0.3; }
-    100% { opacity: 1; }
-}
-
-.empty-state {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    text-align: center;
-}
-</style>
-
-<main>
-    <div class="chat-app-container glass-panel">
+<main class="flex-grow py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full h-[calc(100vh-140px)] min-h-[600px]">
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm h-full flex overflow-hidden relative">
+        
         <!-- Sidebar -->
-        <div class="chat-sidebar">
-            <div class="sidebar-header">Messages</div>
-            <div class="conversation-list" id="convList">
+        <div class="w-full md:w-80 border-r border-slate-200 flex flex-col bg-slate-50 absolute md:relative z-20 h-full transition-transform duration-300" id="chatSidebar">
+            <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-white">
+                <h2 class="text-xl font-bold text-slate-900">Messages</h2>
+                <button class="md:hidden text-slate-500 hover:text-slate-800" onclick="toggleSidebar(false)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto" id="convList">
                 <!-- Loaded via JS -->
+                <div class="p-8 text-center text-slate-500">
+                    <i class="fas fa-circle-notch fa-spin text-2xl text-brand mb-2 block"></i>
+                    Loading chats...
+                </div>
             </div>
         </div>
 
         <!-- Main Workspace -->
-        <div class="chat-main" id="chatMain">
-            <div class="empty-state" id="emptyState">
-                <i class="far fa-comments" style="font-size: 64px; margin-bottom: 20px; opacity: 0.5;"></i>
-                <h3>Your Conversations</h3>
+        <div class="flex-1 flex flex-col relative h-full bg-slate-100/50" id="chatMain">
+            <!-- Mobile Menu Toggle Overlay -->
+            <button class="md:hidden absolute top-4 left-4 z-10 bg-white border border-slate-200 text-slate-700 w-10 h-10 rounded-full shadow-sm flex items-center justify-center hover:text-brand" onclick="toggleSidebar(true)" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Empty State -->
+            <div class="flex-1 flex flex-col items-center justify-center text-slate-400 text-center p-8 h-full" id="emptyState">
+                <i class="far fa-comments text-7xl mb-4 text-slate-300"></i>
+                <h3 class="text-xl font-bold text-slate-700 mb-2">Your Conversations</h3>
                 <p>Select a person from the left to start chatting.</p>
             </div>
             
-            <div id="chatContent" style="display: none; flex-direction: column; height: 100%;">
-                <div class="chat-header">
-                    <div class="conv-avatar" id="activePartnerAvatar"><i class="fas fa-user"></i></div>
+            <!-- Chat Interface -->
+            <div id="chatContent" class="hidden flex-col h-full w-full">
+                <!-- Chat Header -->
+                <div class="bg-white px-6 py-4 border-b border-slate-200 flex items-center gap-4 pl-16 md:pl-6">
+                    <div class="w-10 h-10 rounded-full bg-brand/10 text-brand flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user"></i>
+                    </div>
                     <div>
-                        <div class="conv-name" id="activePartnerName">...</div>
-                        <div style="font-size: 12px; color: var(--text-secondary);">Online</div>
+                        <div class="font-bold text-slate-900" id="activePartnerName">...</div>
+                        <div class="text-xs font-semibold text-emerald-500 flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Online
+                        </div>
                     </div>
                 </div>
 
-                <div class="chat-thread" id="chatThread">
+                <!-- Chat Thread -->
+                <div class="flex-1 p-4 sm:p-6 overflow-y-auto flex flex-col gap-4 relative" id="chatThread" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');">
                     <!-- Messages bubbles go here -->
                 </div>
 
-                <div class="chat-input-bar">
-                    <div class="recording-status" id="recordingBar">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <div class="pulse"></div>
-                            <span>Recording Voice...</span>
+                <!-- Input Area -->
+                <div class="bg-white p-4 border-t border-slate-200">
+                    <div class="flex items-center gap-2 relative max-w-4xl mx-auto">
+                        
+                        <!-- Recording Status Banner -->
+                        <div class="absolute inset-0 bg-white z-10 hidden items-center justify-between px-4 rounded-full border border-red-200 shadow-sm" id="recordingBar">
+                            <div class="flex items-center gap-3 text-red-500 font-bold text-sm">
+                                <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></span>
+                                Recording Voice...
+                            </div>
+                            <button onclick="stopRecording()" class="text-brand font-bold uppercase text-sm tracking-wider hover:underline">Done</button>
                         </div>
-                        <button onclick="stopRecording()" style="background:none; border:none; color:var(--primary-teal); cursor:pointer; font-weight:700;">DONE</button>
-                    </div>
 
-                    <label class="attach-btn" title="Send Image/Audio">
-                        <i class="fas fa-paperclip"></i>
-                        <input type="file" id="fileInput" style="display:none" accept="image/*,audio/*">
-                    </label>
-                    <button class="mic-btn" id="micBtn" title="Record Voice">
-                        <i class="fas fa-microphone"></i>
-                    </button>
-                    <input type="text" id="msgInput" placeholder="Type a message...">
-                    <button class="btn-sell" style="margin: 0; padding: 10px 25px; border-radius: 25px;" id="sendBtn">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                        <!-- Add Attachment -->
+                        <label class="w-10 h-10 rounded-full text-slate-500 hover:bg-slate-100 hover:text-brand flex items-center justify-center cursor-pointer transition flex-shrink-0">
+                            <i class="fas fa-paperclip text-lg"></i>
+                            <input type="file" id="fileInput" class="hidden" accept="image/*,audio/*">
+                        </label>
+                        
+                        <!-- Mic -->
+                        <button class="w-10 h-10 rounded-full text-slate-500 hover:bg-slate-100 hover:text-brand flex items-center justify-center transition flex-shrink-0" id="micBtn" title="Record Voice">
+                            <i class="fas fa-microphone text-lg"></i>
+                        </button>
+                        
+                        <!-- Text Input -->
+                        <input type="text" id="msgInput" placeholder="Type a message..." class="flex-1 bg-slate-100 border border-slate-200 text-slate-800 text-sm rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-brand/20 transition focus:bg-white focus:border-brand">
+                        
+                        <!-- Send Button -->
+                        <button class="w-10 h-10 sm:w-auto sm:px-6 rounded-full bg-brand hover:bg-brand-light text-white flex items-center justify-center gap-2 transition flex-shrink-0" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            <span class="hidden sm:inline font-bold">Send</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -289,6 +120,9 @@ $(document).ready(function() {
         const id = $(this).data('id');
         const name = $(this).data('name');
         openChat(id, name);
+        if (window.innerWidth < 768) {
+            toggleSidebar(false);
+        }
     });
 
     $('#sendBtn').click(sendTextMessage);
@@ -314,6 +148,20 @@ $(document).ready(function() {
         }, 500);
     }
 });
+
+function toggleSidebar(show) {
+    const sidebar = document.getElementById('chatSidebar');
+    if (show) {
+        sidebar.classList.remove('-translate-x-full');
+    } else {
+        sidebar.classList.add('-translate-x-full');
+    }
+}
+
+// Initially hide sidebar on mobile if not already
+if (window.innerWidth < 768) {
+    document.getElementById('chatSidebar').classList.add('-translate-x-full');
+}
 
 function startRecording() {
     navigator.mediaDevices.getUserMedia({ audio: true })
@@ -351,29 +199,32 @@ function loadConversations() {
         const conversations = JSON.parse(data);
         let html = '';
         conversations.forEach(c => {
+            const activeClass = currentPartnerId == c.partner_id ? 'bg-brand/5 border-l-4 border-brand' : 'hover:bg-slate-100 hover:border-transparent border-l-4 border-transparent';
             html += `
-                <div class="conv-item ${currentPartnerId == c.partner_id ? 'active' : ''}" data-id="${c.partner_id}" data-name="${c.partner_name}">
-                    <div class="conv-avatar"><i class="fas fa-user"></i></div>
-                    <div class="conv-info">
-                        <div class="conv-name">${c.partner_name}</div>
-                        <div class="conv-snippet">${c.file_type !== 'text' ? '['+c.file_type.toUpperCase()+']' : c.last_msg}</div>
+                <div class="conv-item cursor-pointer p-4 flex items-center gap-4 transition border-b border-slate-100 ${activeClass}" data-id="${c.partner_id}" data-name="${c.partner_name}">
+                    <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center flex-shrink-0"><i class="fas fa-user text-xl"></i></div>
+                    <div class="overflow-hidden flex-1">
+                        <div class="font-bold text-slate-900 truncate">${c.partner_name}</div>
+                        <div class="text-sm text-slate-500 truncate mt-0.5">${c.file_type !== 'text' ? '<i class="fas fa-paperclip"></i> '+c.file_type.toUpperCase() : c.last_msg}</div>
                     </div>
                 </div>
             `;
         });
-        $('#convList').html(html || '<div style="padding:20px; text-align:center; color:#999;">No conversations yet</div>');
+        $('#convList').html(html || '<div class="p-8 text-center text-slate-500">No conversations yet.<br><small>Message sellers to start chatting!</small></div>');
     });
 }
 
 function openChat(partnerId, partnerName) {
     currentPartnerId = partnerId;
     $('#emptyState').hide();
-    $('#chatContent').css('display', 'flex');
+    $('#chatContent').css('display', 'flex').removeClass('hidden');
     $('#activePartnerName').text(partnerName);
-    $('.conv-item').removeClass('active');
-    $(`.conv-item[data-id="${partnerId}"]`).addClass('active');
+    
+    // Update sidebar UI state without full reload
+    $('.conv-item').removeClass('bg-brand/5 border-brand').addClass('hover:bg-slate-100 border-transparent');
+    $(`.conv-item[data-id="${partnerId}"]`).removeClass('hover:bg-slate-100 border-transparent').addClass('bg-brand/5 border-brand');
 
-    $('#chatThread').html('<div style="text-align:center; padding:20px;">Loading chat...</div>');
+    $('#chatThread').html('<div class="p-8 text-center text-slate-500"><i class="fas fa-circle-notch fa-spin text-2xl text-brand mb-2 block"></i> Loading messages...</div>');
 
     $.get(`api/messages.php?action=get_thread&partner_id=${partnerId}`, function(data) {
         const messages = JSON.parse(data);
@@ -389,20 +240,21 @@ function renderMessages(messages, append = true) {
     let html = '';
     messages.forEach(m => {
         const isMe = m.sender_id == <?= $_SESSION['user_id'] ?>;
-        let contentHtml = '';
+        const alignClass = isMe ? 'self-end bg-brand text-white rounded-tr-sm' : 'self-start bg-white text-slate-800 rounded-tl-sm border border-slate-200 shadow-sm';
         
+        let contentHtml = '';
         if (m.file_type === 'image') {
-            contentHtml = `<img src="${m.file_path}" class="chat-attachment">`;
+            contentHtml = `<img src="${m.file_path}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2">`;
         } else if (m.file_type === 'audio') {
-            contentHtml = `<audio controls class="chat-attachment" style="max-width:200px;"><source src="${m.file_path}"></audio>`;
+            contentHtml = `<audio controls class="max-w-[200px] sm:max-w-xs mb-2"><source src="${m.file_path}"></audio>`;
         }
         
-        contentHtml += `<span>${m.content || ''}</span>`;
+        contentHtml += `<span class="break-words">${m.content || ''}</span>`;
 
         html += `
-            <div class="bubble ${isMe ? 'sent' : 'received'}" data-id="${m.id}">
+            <div class="max-w-[80%] sm:max-w-[70%] rounded-2xl px-4 py-2.5 text-[15px] leading-snug flex flex-col ${alignClass}" data-id="${m.id}">
                 ${contentHtml}
-                <span class="bubble-time">${m.created_at}</span>
+                <span class="text-[10px] opacity-70 mt-1 self-end whitespace-nowrap">${m.created_at}</span>
             </div>
         `;
         lastMessageId = Math.max(lastMessageId, m.id);
@@ -412,6 +264,9 @@ function renderMessages(messages, append = true) {
         $('#chatThread').append(html);
         if (messages.length > 0) scrollToBottom();
     } else {
+        if(messages.length === 0) {
+            html = '<div class="text-center text-slate-400 mt-10 p-4 bg-white/50 rounded-lg max-w-sm mx-auto">This is the beginning of your chat history.</div>';
+        }
         $('#chatThread').html(html);
     }
 }
@@ -420,7 +275,7 @@ function sendTextMessage() {
     const text = $('#msgInput').val().trim();
     if (!text || !currentPartnerId) return;
     $('#msgInput').val('');
-    $.post('api/messages.php?action=send', { receiver_id: currentPartnerId, content: text, is_ajax: 1 }, function() { pollNewMessages(); });
+    $.post('api/messages.php?action=send', { receiver_id: currentPartnerId, content: text, is_ajax: 1 }, function() { pollNewMessages(); loadConversations(); });
 }
 
 function sendFile(file) {
@@ -446,7 +301,10 @@ function pollNewMessages() {
     if (!currentPartnerId) return;
     $.get(`api/messages.php?action=poll&partner_id=${currentPartnerId}&last_id=${lastMessageId}`, function(data) {
         const newMsgs = JSON.parse(data);
-        if (newMsgs.length > 0) renderMessages(newMsgs, true);
+        if (newMsgs.length > 0) {
+            renderMessages(newMsgs, true);
+            loadConversations();
+        }
     });
 }
 

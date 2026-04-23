@@ -1,4 +1,5 @@
--- Adding Messages table explicitly since it was missing from initial dump
+
+
 CREATE TABLE IF NOT EXISTS `messages` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sender_id` int(11) NOT NULL,

@@ -38,215 +38,173 @@ $totalChats = $msgStmt->fetchColumn();
 include 'includes/header.php'; 
 ?>
 
-<style>
-.profile-edit-form {
-    display: none;
-    padding: 30px;
-    border-radius: var(--radius-xl);
-    margin-bottom: 25px;
-    animation: fadeInUp 0.3s ease;
-}
-.profile-edit-form.show { display: block; }
-.profile-edit-form .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    margin-bottom: 18px;
-}
-.profile-edit-form label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--primary-teal);
-}
-.profile-edit-form input {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: var(--radius-md);
-    border: 1.5px solid var(--glass-border);
-    background: rgba(255,255,255,0.5);
-    font-size: 14px;
-    font-family: inherit;
-    outline: none;
-    transition: all var(--transition-fast);
-}
-.profile-edit-form input:focus {
-    border-color: var(--accent-cyan);
-    box-shadow: 0 0 0 3px rgba(35, 229, 219, 0.15);
-}
-
-/* ad management card */
-.my-ad-card {
-    display: flex;
-    gap: 18px;
-    padding: 18px;
-    border-radius: var(--radius-lg);
-    margin-bottom: 15px;
-    transition: all var(--transition-smooth);
-    animation: fadeInUp 0.4s ease backwards;
-}
-.my-ad-card:hover {
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    transform: translateY(-2px);
-}
-.my-ad-thumb {
-    width: 140px;
-    height: 105px;
-    border-radius: var(--radius-md);
-    object-fit: cover;
-    flex-shrink: 0;
-}
-.my-ad-details { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.my-ad-details h3 { font-size: 16px; font-weight: 600; color: var(--primary-teal); margin-bottom: 4px; }
-.my-ad-details .price { font-size: 18px; font-weight: 700; color: var(--text-primary); }
-.my-ad-meta { display: flex; align-items: center; gap: 15px; font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
-
-@media (max-width: 768px) {
-    .my-ad-card { flex-direction: column; }
-    .my-ad-thumb { width: 100%; height: 160px; }
-    .profile-edit-form .form-row { grid-template-columns: 1fr; }
-}
-</style>
-
-<main>
-    <div class="profile-container">
-        <!-- Profile Header -->
-        <div class="profile-header glass-panel">
-            <div class="profile-avatar">
-                <i class="fas fa-user"></i>
-            </div>
-            <div class="profile-info" style="flex:1;">
-                <h2><?= htmlspecialchars($user['name']) ?></h2>
-                <p><i class="far fa-envelope"></i> <?= htmlspecialchars($user['email']) ?></p>
+<main class="flex-grow py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+    
+    <!-- Profile Header -->
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8 mb-8 flex flex-col md:flex-row items-center md:items-start gap-6 relative">
+        <div class="w-24 h-24 bg-brand/10 text-brand rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-user text-4xl"></i>
+        </div>
+        
+        <div class="flex-1 text-center md:text-left">
+            <h2 class="text-2xl font-bold text-slate-900 mb-2"><?= htmlspecialchars($user['name']) ?></h2>
+            <div class="flex flex-col md:flex-row gap-2 md:gap-6 text-sm text-slate-600 mb-6 font-medium">
+                <span class="flex items-center justify-center md:justify-start gap-2"><i class="far fa-envelope text-slate-400"></i> <?= htmlspecialchars($user['email']) ?></span>
                 <?php if($user['phone']): ?>
-                    <p><i class="fas fa-phone"></i> <?= htmlspecialchars($user['phone']) ?></p>
+                    <span class="flex items-center justify-center md:justify-start gap-2"><i class="fas fa-phone text-slate-400"></i> <?= htmlspecialchars($user['phone']) ?></span>
                 <?php endif; ?>
-                <div class="profile-stats">
-                    <div class="profile-stat">
-                        <div class="stat-val"><?= $totalAds ?></div>
-                        <div class="stat-label">Total Ads</div>
-                    </div>
-                    <div class="profile-stat">
-                        <div class="stat-val"><?= $activeAds ?></div>
-                        <div class="stat-label">Active</div>
-                    </div>
-                    <div class="profile-stat">
-                        <div class="stat-val"><?= $soldAds ?></div>
-                        <div class="stat-label">Sold</div>
-                    </div>
-                    <div class="profile-stat">
-                        <div class="stat-val"><?= $totalChats ?></div>
-                        <div class="stat-label">Chats</div>
-                    </div>
+            </div>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 text-center">
+                    <div class="text-2xl font-extrabold text-brand"><?= $totalAds ?></div>
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">Total Ads</div>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
+                    <div class="text-2xl font-extrabold text-emerald-600"><?= $activeAds ?></div>
+                    <div class="text-xs font-semibold text-emerald-600 uppercase tracking-widest mt-1">Active</div>
+                </div>
+                <div class="bg-slate-100 border border-slate-200 rounded-xl p-4 text-center">
+                    <div class="text-2xl font-extrabold text-slate-700"><?= $soldAds ?></div>
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-widest mt-1">Sold</div>
+                </div>
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
+                    <div class="text-2xl font-extrabold text-blue-600"><?= $totalChats ?></div>
+                    <div class="text-xs font-semibold text-blue-600 uppercase tracking-widest mt-1">Chats</div>
                 </div>
             </div>
-            <button class="btn-sell" style="align-self: flex-start;" onclick="toggleEditForm()">
-                <i class="fas fa-pen"></i> Edit Profile
-            </button>
         </div>
+        
+        <button onclick="toggleEditForm()" class="mt-4 md:mt-0 w-full md:w-auto bg-white border-2 border-slate-200 hover:border-brand text-slate-700 hover:text-brand font-bold py-2.5 px-6 rounded-full transition shadow-sm flex items-center justify-center gap-2">
+            <i class="fas fa-pen"></i> Edit Profile
+        </button>
+    </div>
 
-        <!-- Edit Profile Form (hidden by default) -->
-        <div class="profile-edit-form glass-panel" id="editProfileForm">
-            <h3 style="margin-bottom: 20px; color: var(--primary-teal);">Edit Profile</h3>
-            <form action="api/auth.php?action=update_profile" method="POST">
-                <div class="form-row">
-                    <div>
-                        <label>Full Name</label>
-                        <input type="text" name="name" value="<?= htmlspecialchars($user['name']) ?>" required>
-                    </div>
-                    <div>
-                        <label>Phone Number</label>
-                        <input type="text" name="phone" value="<?= htmlspecialchars($user['phone'] ?? '') ?>" placeholder="03xx-xxxxxxx">
-                    </div>
+    <!-- Edit Profile Form (hidden by default) -->
+    <div id="editProfileForm" class="hidden bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8 mb-8 transition-all">
+        <h3 class="text-xl font-bold text-slate-900 mb-6">Edit Profile</h3>
+        <form action="api/auth.php?action=update_profile" method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
+                    <input type="text" name="name" value="<?= htmlspecialchars($user['name']) ?>" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 outline-none text-slate-800">
                 </div>
-                <div class="form-row">
-                    <div>
-                        <label>Email (cannot be changed)</label>
-                        <input type="email" value="<?= htmlspecialchars($user['email']) ?>" disabled style="opacity:0.6;">
-                    </div>
-                    <div>
-                        <label>New Password (leave blank to keep)</label>
-                        <input type="password" name="new_password" placeholder="••••••••">
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
+                    <input type="text" name="phone" value="<?= htmlspecialchars($user['phone'] ?? '') ?>" placeholder="03xx-xxxxxxx" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 outline-none text-slate-800">
                 </div>
-                <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:10px;">
-                    <button type="button" class="ad-action-btn" onclick="toggleEditForm()">Cancel</button>
-                    <button type="submit" class="btn-sell" style="padding: 10px 24px;">Save Changes</button>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Email (cannot be changed)</label>
+                    <input type="email" value="<?= htmlspecialchars($user['email']) ?>" disabled class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-500 cursor-not-allowed">
                 </div>
-            </form>
-        </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">New Password (leave blank to keep)</label>
+                    <input type="password" name="new_password" placeholder="••••••••" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 outline-none text-slate-800">
+                </div>
+            </div>
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button type="button" onclick="toggleEditForm()" class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-6 rounded-lg transition">Cancel</button>
+                <button type="submit" class="bg-brand hover:bg-brand-light text-white font-bold py-2.5 px-8 rounded-lg shadow-sm transition">Save Changes</button>
+            </div>
+        </form>
+    </div>
 
-        <!-- My Ads Section -->
-        <div class="profile-tabs">
-            <button class="profile-tab active" onclick="filterAds('all', this)">All Ads (<?= $totalAds ?>)</button>
-            <button class="profile-tab" onclick="filterAds('active', this)">Active (<?= $activeAds ?>)</button>
-            <button class="profile-tab" onclick="filterAds('sold', this)">Sold (<?= $soldAds ?>)</button>
-        </div>
+    <!-- My Ads Section -->
+    <div class="mb-6 flex overflow-x-auto no-scrollbar gap-2 border-b border-slate-200">
+        <button class="profile-tab active whitespace-nowrap pb-3 px-4 font-bold text-brand border-b-2 border-brand" onclick="filterAds('all', this)">All Ads (<?= $totalAds ?>)</button>
+        <button class="profile-tab whitespace-nowrap pb-3 px-4 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-800" onclick="filterAds('active', this)">Active (<?= $activeAds ?>)</button>
+        <button class="profile-tab whitespace-nowrap pb-3 px-4 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-800" onclick="filterAds('sold', this)">Sold (<?= $soldAds ?>)</button>
+    </div>
 
-        <div id="adsContainer">
-            <?php if(count($myAds) > 0): ?>
-                <?php foreach($myAds as $i => $ad): ?>
-                    <div class="my-ad-card glass-panel" data-status="<?= $ad['status'] ?>" style="animation-delay: <?= $i * 0.06 ?>s">
-                        <a href="ad.php?id=<?= $ad['id'] ?>">
-                            <?php $img = $ad['main_image'] ?: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=60'; ?>
-                            <img src="<?= htmlspecialchars($img) ?>" alt="Ad" class="my-ad-thumb">
-                        </a>
-                        <div class="my-ad-details">
-                            <div>
-                                <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
-                                    <h3><?= htmlspecialchars($ad['title']) ?></h3>
-                                    <span class="status-badge status-<?= $ad['status'] ?>"><?= ucfirst($ad['status']) ?></span>
-                                </div>
-                                <div class="price">Rs <?= number_format($ad['price']) ?></div>
-                                <div class="my-ad-meta">
-                                    <span><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($ad['location']) ?></span>
-                                    <span><i class="far fa-clock"></i> <?= date('M d, Y', strtotime($ad['created_at'])) ?></span>
-                                    <?php if($ad['category_name']): ?>
-                                        <span><i class="fas fa-tag"></i> <?= htmlspecialchars($ad['category_name']) ?></span>
-                                    <?php endif; ?>
-                                </div>
+    <div id="adsContainer" class="space-y-4">
+        <?php if(count($myAds) > 0): ?>
+            <?php foreach($myAds as $ad): ?>
+                <div class="my-ad-card relative bg-white border border-slate-200 rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row gap-6 transition hover:shadow-md" data-status="<?= $ad['status'] ?>">
+                    
+                    <a href="ad.php?id=<?= $ad['id'] ?>" class="w-full sm:w-48 h-48 sm:h-32 flex-shrink-0 rounded-lg overflow-hidden border border-slate-100">
+                        <?php $img = $ad['main_image'] ?: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80'; ?>
+                        <img src="<?= htmlspecialchars($img) ?>" alt="Ad image" class="w-full h-full object-cover">
+                    </a>
+                    
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-start justify-between gap-4 mb-2">
+                                <h3 class="text-lg font-bold text-slate-900 leading-tight"><?= htmlspecialchars($ad['title']) ?></h3>
+                                <?php
+                                    $bg = 'bg-slate-100 text-slate-700';
+                                    if ($ad['status'] == 'active') $bg = 'bg-emerald-100 text-emerald-800';
+                                    if ($ad['status'] == 'sold') $bg = 'bg-slate-200 text-slate-600';
+                                    if ($ad['status'] == 'pending') $bg = 'bg-amber-100 text-amber-800';
+                                    if ($ad['status'] == 'rejected') $bg = 'bg-red-100 text-red-800';
+                                ?>
+                                <span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full <?= $bg ?>"><?= ucfirst($ad['status']) ?></span>
                             </div>
-                            <div class="ad-actions">
+                            <div class="text-2xl font-extrabold text-brand mb-4">Rs <?= number_format($ad['price']) ?></div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                                <span class="flex items-center gap-1"><i class="fas fa-map-marker-alt text-brand"></i> <?= htmlspecialchars($ad['location']) ?></span>
+                                <span class="flex items-center gap-1"><i class="far fa-clock"></i> <?= date('M d, Y', strtotime($ad['created_at'])) ?></span>
+                                <?php if($ad['category_name']): ?>
+                                    <span class="flex items-center gap-1"><i class="fas fa-tag"></i> <?= htmlspecialchars($ad['category_name']) ?></span>
+                                <?php endif; ?>
+                            </div>
+                            
+                            <div class="flex gap-2 w-full sm:w-auto">
                                 <?php if($ad['status'] === 'active'): ?>
-                                    <button class="ad-action-btn btn-sold" onclick="confirmAction('Mark this ad as sold?', () => window.location='api/ads.php?action=mark_sold&id=<?= $ad['id'] ?>')">
+                                    <button class="flex-1 sm:flex-none bg-white border border-emerald-500 hover:bg-emerald-50 text-emerald-700 font-bold py-2 px-4 rounded-lg text-sm transition flex items-center justify-center gap-2" 
+                                        onclick="confirmAction('Mark this ad as sold?', () => window.location='api/ads.php?action=mark_sold&id=<?= $ad['id'] ?>')">
                                         <i class="fas fa-check-circle"></i> Mark Sold
                                     </button>
                                 <?php endif; ?>
-                                <button class="ad-action-btn btn-delete" onclick="confirmAction('Are you sure you want to delete this ad? This cannot be undone.', () => window.location='api/ads.php?action=delete&id=<?= $ad['id'] ?>')">
+                                <button class="flex-1 sm:flex-none bg-white border border-red-300 hover:bg-red-50 text-red-600 font-bold py-2 px-4 rounded-lg text-sm transition flex items-center justify-center gap-2" 
+                                    onclick="confirmAction('Delete this ad permanently?', () => window.location='api/ads.php?action=delete&id=<?= $ad['id'] ?>')">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <div class="glass-panel" style="padding: 60px; text-align: center; border-radius: var(--radius-xl);">
-                    <i class="fas fa-box-open" style="font-size: 56px; color: var(--glass-border); margin-bottom: 20px;"></i>
-                    <h3>No Ads Posted Yet</h3>
-                    <p style="color: var(--text-secondary); margin: 10px 0 25px;">Start selling by posting your first ad!</p>
-                    <a href="post-ad.php" class="btn-sell"><i class="fas fa-plus"></i> Post an Ad</a>
                 </div>
-            <?php endif; ?>
-        </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <div class="bg-white border border-slate-200 border-dashed rounded-2xl p-16 text-center text-slate-500 flex flex-col items-center justify-center">
+                <i class="fas fa-box-open text-5xl mb-4 text-slate-300"></i>
+                <h3 class="text-xl font-bold text-slate-700 mb-2">No Ads Posted Yet</h3>
+                <p class="mb-6">Start selling by posting your first ad!</p>
+                <a href="post-ad.php" class="bg-brand text-white font-bold px-6 py-2.5 rounded-full hover:bg-brand-light transition flex items-center gap-2">
+                    <i class="fas fa-plus"></i> Post an Ad
+                </a>
+            </div>
+        <?php endif; ?>
     </div>
 </main>
 
 <script>
 function toggleEditForm() {
-    $('#editProfileForm').toggleClass('show');
+    const form = document.getElementById('editProfileForm');
+    form.classList.toggle('hidden');
 }
 
 function filterAds(status, btn) {
-    $('.profile-tab').removeClass('active');
-    $(btn).addClass('active');
+    // Update tabs
+    document.querySelectorAll('.profile-tab').forEach(t => {
+        t.className = 'profile-tab whitespace-nowrap pb-3 px-4 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-800';
+    });
+    btn.className = 'profile-tab active whitespace-nowrap pb-3 px-4 font-bold text-brand border-b-2 border-brand';
     
-    if (status === 'all') {
-        $('.my-ad-card').show();
-    } else {
-        $('.my-ad-card').hide();
-        $(`.my-ad-card[data-status="${status}"]`).show();
-    }
+    // Filter ads
+    document.querySelectorAll('.my-ad-card').forEach(card => {
+        if (status === 'all' || card.getAttribute('data-status') === status) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function confirmAction(msg, action) {
+    if(confirm(msg)) action();
 }
 </script>
 

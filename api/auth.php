@@ -4,23 +4,23 @@ require_once '../includes/config.php';
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
-// ---------------------------------------------------------
+
 // 1. STANDARD LOGIN
-// ---------------------------------------------------------
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $identifier = sanitize_input($_POST['identifier']);
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT id, name, email, password, is_phone_verified FROM users WHERE email = ? OR name = ? OR phone = ?");
+    $stmt = $pdo->prepare("SELECT id, name, email, password, role, is_email_verified FROM users WHERE email = ? OR name = ? OR phone = ?");
     $stmt->execute([$identifier, $identifier, $identifier]);
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
-        if ($user['is_phone_verified'] == 0) {
-            $otp = rand(1000, 9999);
-            $upd = $pdo->prepare("UPDATE users SET otp_code = ? WHERE id = ?");
-            $upd->execute([$otp, $user['id']]);
-            header("Location: ../verify-phone.php?email=" . urlencode($user['email']) . "&simulated_otp=" . $otp);
+        if ($user['is_email_verified'] == 0) {
+            $token = bin2hex(random_bytes(32));
+            $upd = $pdo->prepare("UPDATE users SET email_verification_token = ? WHERE id = ?");
+            $upd->execute([$token, $user['id']]);
+            header("Location: ../verify-email.php?email=" . urlencode($user['email']) . "&simulated_token=" . $token);
             exit;
         }
         
@@ -28,10 +28,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
+        $_SESSION['user_role'] = $user['role'];
 
-        // ---------------------------------------------------------
+
         // REMEMBER ME Logic
-        // ---------------------------------------------------------
+
         if (isset($_POST['remember_me'])) {
             $selector = bin2hex(random_bytes(8));
             $token = bin2hex(random_bytes(32));
@@ -66,9 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     }
 }
 
-// ---------------------------------------------------------
+
 // 2. STANDARD SIGNUP
-// ---------------------------------------------------------
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signup'])) {
     $name = sanitize_input($_POST['name']);
     $email = sanitize_input($_POST['email']);
@@ -83,10 +84,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signup'])) {
         header("Location: ../signup.php?error=email_exists");
         exit;
     } else {
-        $otp = rand(1000, 9999);
-        $insert_stmt = $pdo->prepare("INSERT INTO users (name, email, phone, password, is_phone_verified, otp_code) VALUES (?, ?, ?, ?, 0, ?)");
-        if ($insert_stmt->execute([$name, $email, $phone, $password, $otp])) {
-            header("Location: ../verify-phone.php?email=" . urlencode($email) . "&simulated_otp=" . $otp);
+        $token = bin2hex(random_bytes(32));
+        $insert_stmt = $pdo->prepare("INSERT INTO users (name, email, phone, password, is_email_verified, email_verification_token) VALUES (?, ?, ?, ?, 0, ?)");
+        if ($insert_stmt->execute([$name, $email, $phone, $password, $token])) {
+            header("Location: ../verify-email.php?email=" . urlencode($email) . "&simulated_token=" . $token);
             exit;
         } else {
             header("Location: ../signup.php?error=registration_failed");
@@ -95,9 +96,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signup'])) {
     }
 }
 
-// ---------------------------------------------------------
+
 // 3. GOOGLE LOGIN INITIATION
-// ---------------------------------------------------------
+
 if ($action == 'google_login') {
     // Generate state for CSRF protection
     $_SESSION['google_state'] = bin2hex(random_bytes(16));
@@ -115,9 +116,9 @@ if ($action == 'google_login') {
     exit;
 }
 
-// ---------------------------------------------------------
+
 // 4. GOOGLE CALLBACK LOGIC
-// ---------------------------------------------------------
+
 if ($action == 'google_callback') {
     // Validate state
     if (!isset($_GET['state']) || $_GET['state'] !== $_SESSION['google_state']) {
@@ -163,7 +164,7 @@ if ($action == 'google_callback') {
         }
         
         // 2. Check if user exists in our DB
-        $stmt = $pdo->prepare("SELECT id, name FROM users WHERE email = ?");
+        $stmt = $pdo->prepare("SELECT id, name, role FROM users WHERE email = ?");
         $stmt->execute([$google_user_email]);
         $user = $stmt->fetch();
         
@@ -171,6 +172,7 @@ if ($action == 'google_callback') {
             // User exists, log them in
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
+            $_SESSION['user_role'] = $user['role'];
         } else {
             // User does not exist, create new account
             // Random secure password since they use Google
@@ -180,6 +182,7 @@ if ($action == 'google_callback') {
             
             $_SESSION['user_id'] = $pdo->lastInsertId();
             $_SESSION['user_name'] = $google_user_name;
+            $_SESSION['user_role'] = 'user';
         }
         
         header("Location: ../index.php");
@@ -187,9 +190,9 @@ if ($action == 'google_callback') {
     }
 }
 
-// ---------------------------------------------------------
+
 // 5. UPDATE PROFILE
-// ---------------------------------------------------------
+
 if ($action == 'update_profile' && $_SERVER["REQUEST_METHOD"] == "POST") {
     if (!isset($_SESSION['user_id'])) {
         header("Location: ../login.php?error=login_required");
@@ -219,9 +222,9 @@ if ($action == 'update_profile' && $_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 
-// ---------------------------------------------------------
+
 // 6. FORGOT & RESET PASSWORD
-// ---------------------------------------------------------
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'forgot_password') {
     $email = sanitize_input($_POST['email']);
     
@@ -267,31 +270,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'verify_otp') {
-    $email = sanitize_input($_POST['email']);
-    $entered_otp = sanitize_input($_POST['otp']);
+if ($_SERVER["REQUEST_METHOD"] == "GET" && $action == 'verify_email') {
+    $token = isset($_GET['token']) ? sanitize_input($_GET['token']) : '';
     
-    $stmt = $pdo->prepare("SELECT id, name, otp_code FROM users WHERE email = ?");
-    $stmt->execute([$email]);
+    $stmt = $pdo->prepare("SELECT id, name FROM users WHERE email_verification_token = ?");
+    $stmt->execute([$token]);
     $user = $stmt->fetch();
     
-    if ($user && $user['otp_code'] === $entered_otp) {
-        $upd = $pdo->prepare("UPDATE users SET is_phone_verified = 1, otp_code = NULL WHERE id = ?");
+    if ($user) {
+        $upd = $pdo->prepare("UPDATE users SET is_email_verified = 1, email_verification_token = NULL WHERE id = ?");
         $upd->execute([$user['id']]);
         
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
-        header("Location: ../index.php?success=account_verified");
+        header("Location: ../index.php?success=email_verified");
         exit;
     } else {
-        header("Location: ../verify-phone.php?email=" . urlencode($email) . "&error=invalid_otp");
+        header("Location: ../login.php?error=invalid_verification_token");
         exit;
     }
 }
 
-// ---------------------------------------------------------
+
 // 7. LOGOUT
-// ---------------------------------------------------------
+
 if ($action == 'logout') {
     // Clear Remember Me cookie
     if (isset($_COOKIE['remember_me'])) {

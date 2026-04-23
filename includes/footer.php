@@ -1,48 +1,76 @@
-    <footer class="glass-panel">
-        <div>
-            <h4>POPULAR CATEGORIES</h4>
-            <ul>
-                <li><a href="search.php?category=vehicles">Cars</a></li>
-                <li><a href="search.php?category=property">Flats for rent</a></li>
-                <li><a href="search.php?category=mobiles">Mobile Phones</a></li>
-                <li><a href="search.php?category=electronics">Electronics</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4>TRENDING SEARCHES</h4>
-            <ul>
-                <li><a href="search.php?q=bikes">Bikes</a></li>
-                <li><a href="search.php?q=watches">Watches</a></li>
-                <li><a href="search.php?q=laptops">Laptops</a></li>
-                <li><a href="search.php?q=iphone">iPhone</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4>ABOUT US</h4>
-            <ul>
-                <li><a href="#">About OLX Group</a></li>
-                <li><a href="#">OLX Blog</a></li>
-                <li><a href="#">Contact Us</a></li>
-                <li><a href="#">OLX for Businesses</a></li>
-            </ul>
-        </div>
-        <div>
-            <h4>OLX</h4>
-            <ul>
-                <li><a href="#">Help</a></li>
-                <li><a href="#">Sitemap</a></li>
-                <li><a href="#">Terms of use</a></li>
-                <li><a href="#">Privacy Policy</a></li>
-            </ul>
-            <div style="margin-top:20px; display:flex; gap:12px;">
-                <a href="#" style="width:36px; height:36px; border-radius:50%; background:rgba(0,47,52,0.08); display:flex; align-items:center; justify-content:center; color:var(--primary-teal); transition:all 0.2s;" onmouseover="this.style.background='var(--primary-teal)'; this.style.color='white';" onmouseout="this.style.background='rgba(0,47,52,0.08)'; this.style.color='var(--primary-teal)';"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" style="width:36px; height:36px; border-radius:50%; background:rgba(0,47,52,0.08); display:flex; align-items:center; justify-content:center; color:var(--primary-teal); transition:all 0.2s;" onmouseover="this.style.background='var(--primary-teal)'; this.style.color='white';" onmouseout="this.style.background='rgba(0,47,52,0.08)'; this.style.color='var(--primary-teal)';"><i class="fab fa-twitter"></i></a>
-                <a href="#" style="width:36px; height:36px; border-radius:50%; background:rgba(0,47,52,0.08); display:flex; align-items:center; justify-content:center; color:var(--primary-teal); transition:all 0.2s;" onmouseover="this.style.background='var(--primary-teal)'; this.style.color='white';" onmouseout="this.style.background='rgba(0,47,52,0.08)'; this.style.color='var(--primary-teal)';"><i class="fab fa-instagram"></i></a>
+<footer class="bg-white border-t border-slate-200 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div>
+                <h4 class="text-slate-900 font-bold text-sm uppercase tracking-wide mb-4">Popular Categories</h4>
+                <ul class="space-y-3">
+                    <li><a href="search.php?category=1" class="text-sm text-slate-500 hover:text-accent transition">Cars</a></li>
+                    <li><a href="search.php?category=2" class="text-sm text-slate-500 hover:text-accent transition">Flats for rent</a></li>
+                    <li><a href="search.php?category=3" class="text-sm text-slate-500 hover:text-accent transition">Mobile Phones</a></li>
+                    <li><a href="search.php?category=4" class="text-sm text-slate-500 hover:text-accent transition">Jobs</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="text-slate-900 font-bold text-sm uppercase tracking-wide mb-4">Trending Searches</h4>
+                <ul class="space-y-3">
+                    <li><a href="search.php?q=Bikes" class="text-sm text-slate-500 hover:text-accent transition">Bikes</a></li>
+                    <li><a href="search.php?q=Watches" class="text-sm text-slate-500 hover:text-accent transition">Watches</a></li>
+                    <li><a href="search.php?q=Books" class="text-sm text-slate-500 hover:text-accent transition">Books</a></li>
+                    <li><a href="search.php?q=Dogs" class="text-sm text-slate-500 hover:text-accent transition">Dogs</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="text-slate-900 font-bold text-sm uppercase tracking-wide mb-4">About Us</h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">About OLX Group</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">OLX Blog</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">Contact Us</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">OLX for Businesses</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="text-slate-900 font-bold text-sm uppercase tracking-wide mb-4">OLX Clone</h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">Help</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">Sitemap</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">Terms of use</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">Privacy Policy</a></li>
+                </ul>
             </div>
         </div>
-    </footer>
-    <div style="text-align:center; padding:15px; font-size:12px; color:var(--text-secondary); background:rgba(255,255,255,0.3);">
-        &copy; <?= date('Y') ?> OLX Clone &mdash; Database Project. All rights reserved.
+        
+        <div class="mt-12 pt-8 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <p class="text-xs font-bold text-brand uppercase tracking-wider">Follow Us</p>
+                <div class="flex gap-3">
+                    <a href="#" class="text-slate-400 hover:text-brand transition"><i class="fab fa-facebook-f text-lg"></i></a>
+                    <a href="#" class="text-slate-400 hover:text-brand transition"><i class="fab fa-twitter text-lg"></i></a>
+                    <a href="#" class="text-slate-400 hover:text-brand transition"><i class="fab fa-instagram text-lg"></i></a>
+                </div>
+            </div>
+            <p class="text-xs text-slate-500">Free Classifieds in Pakistan . &copy; 2006-2026 OLX Clone</p>
+        </div>
     </div>
+</footer>
+
+<script>
+    // Toast notification handling
+    function showToast(message, type = 'success') {
+        const bg = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+        const toast = document.createElement('div');
+        toast.className = `fixed bottom-4 right-4 ${bg} text-white px-6 py-3 rounded shadow-lg transform transition-all duration-300 translate-y-0 opacity-100 z-50`;
+        toast.innerText = message;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('translate-y-2', 'opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+</script>
 </body>
 </html>

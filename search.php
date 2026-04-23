@@ -51,108 +51,9 @@ $categories = $catStmt->fetchAll();
 include 'includes/header.php'; 
 ?>
 
-<style>
-.search-header-panel {
-    margin-bottom: 25px;
-    padding: 25px;
-    border-radius: var(--radius-xl);
-    animation: fadeInUp 0.3s ease;
-}
-
-.search-header-panel h2 {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--primary-teal);
-    margin-bottom: 4px;
-}
-
-.search-header-panel p {
-    color: var(--text-secondary);
-    font-size: 14px;
-    margin-bottom: 18px;
-}
-
-.filter-form {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.filter-form input,
-.filter-form select {
-    padding: 10px 16px;
-    border-radius: var(--radius-sm);
-    border: 1.5px solid var(--glass-border);
-    background: rgba(255,255,255,0.6);
-    font-family: inherit;
-    font-size: 14px;
-    outline: none;
-    transition: all var(--transition-fast);
-    color: var(--text-primary);
-}
-
-.filter-form input:focus,
-.filter-form select:focus {
-    border-color: var(--accent-cyan);
-    box-shadow: 0 0 0 3px rgba(35, 229, 219, 0.12);
-}
-
-.active-filters {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 15px;
-}
-
-.filter-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 12px;
-    border-radius: var(--radius-full);
-    background: rgba(35, 229, 219, 0.1);
-    color: var(--primary-teal);
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.filter-tag a {
-    color: var(--danger);
-    font-size: 14px;
-}
-
-/* Category pills for search page */
-.category-filter-strip {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 15px;
-}
-
-.cat-pill {
-    padding: 6px 14px;
-    border-radius: var(--radius-full);
-    background: rgba(255,255,255,0.5);
-    border: 1px solid var(--glass-border);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    transition: all var(--transition-fast);
-    text-decoration: none;
-}
-
-.cat-pill:hover,
-.cat-pill.active {
-    background: var(--primary-teal);
-    color: white;
-    border-color: var(--primary-teal);
-}
-</style>
-
-<main>
-    <div class="search-header-panel glass-panel">
-        <h2>
+<main class="flex-grow py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8 mb-8">
+        <h2 class="text-2xl font-bold text-slate-900 mb-1">
             <?php if($query): ?>
                 Results for "<?= htmlspecialchars($query) ?>"
             <?php elseif($category): ?>
@@ -161,69 +62,87 @@ include 'includes/header.php';
                 Browse All Ads
             <?php endif; ?>
         </h2>
-        <p><?= count($results) ?> ad<?= count($results) !== 1 ? 's' : '' ?> found</p>
+        <p class="text-slate-500 text-sm mb-6"><?= count($results) ?> ad<?= count($results) !== 1 ? 's' : '' ?> found</p>
         
-        <form action="search.php" method="GET" class="filter-form" id="searchFilterForm">
-            <input type="text" name="q" value="<?= htmlspecialchars($query) ?>" placeholder="Search keyword..." style="flex:1; min-width:180px;">
-            <input type="text" name="location" value="<?= htmlspecialchars($location) ?>" placeholder="City or area..." style="min-width:150px;">
+        <form action="search.php" method="GET" class="flex flex-wrap gap-4 items-center">
+            <input type="text" name="q" value="<?= htmlspecialchars($query) ?>" placeholder="Search keyword..." class="flex-grow min-w-[200px] px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 outline-none text-slate-800">
+            <input type="text" name="location" value="<?= htmlspecialchars($location) ?>" placeholder="City or area..." class="w-full sm:w-auto min-w-[150px] px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 outline-none text-slate-800">
             
-            <select name="category">
+            <select name="category" class="w-full sm:w-auto px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 outline-none text-slate-800 bg-white">
                 <option value="">All Categories</option>
                 <?php foreach($categories as $cat): ?>
                     <option value="<?= $cat['slug'] ?>" <?= $category == $cat['slug'] ? 'selected' : '' ?>><?= htmlspecialchars($cat['name']) ?></option>
                 <?php endforeach; ?>
             </select>
             
-            <select name="sort">
+            <select name="sort" class="w-full sm:w-auto px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 outline-none text-slate-800 bg-white">
                 <option value="time_desc" <?= $sort == 'time_desc' ? 'selected' : '' ?>>Newest First</option>
                 <option value="price_asc" <?= $sort == 'price_asc' ? 'selected' : '' ?>>Lowest Price</option>
                 <option value="price_desc" <?= $sort == 'price_desc' ? 'selected' : '' ?>>Highest Price</option>
             </select>
             
-            <button type="submit" class="btn-sell" style="padding: 10px 22px;">
+            <button type="submit" class="w-full sm:w-auto bg-brand hover:bg-brand-light text-white font-bold py-3 px-6 rounded-lg transition sm:ml-auto">
                 <i class="fas fa-filter"></i> Filter
             </button>
         </form>
 
         <?php if($query || $category || $location): ?>
-        <div class="active-filters">
+        <div class="flex flex-wrap gap-2 mt-6 pt-6 border-t border-slate-100">
             <?php if($query): ?>
-                <span class="filter-tag"><i class="fas fa-search"></i> <?= htmlspecialchars($query) ?> <a href="search.php?category=<?= $category ?>&location=<?= $location ?>&sort=<?= $sort ?>">&times;</a></span>
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/10 text-brand text-xs font-bold">
+                    <i class="fas fa-search"></i> <?= htmlspecialchars($query) ?> 
+                    <a href="search.php?category=<?= $category ?>&location=<?= $location ?>&sort=<?= $sort ?>" class="text-red-500 hover:text-red-700 ml-1 text-sm">&times;</a>
+                </span>
             <?php endif; ?>
             <?php if($category): ?>
-                <span class="filter-tag"><i class="fas fa-tag"></i> <?= ucfirst(htmlspecialchars($category)) ?> <a href="search.php?q=<?= $query ?>&location=<?= $location ?>&sort=<?= $sort ?>">&times;</a></span>
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/10 text-brand text-xs font-bold">
+                    <i class="fas fa-tag"></i> <?= ucfirst(htmlspecialchars($category)) ?> 
+                    <a href="search.php?q=<?= $query ?>&location=<?= $location ?>&sort=<?= $sort ?>" class="text-red-500 hover:text-red-700 ml-1 text-sm">&times;</a>
+                </span>
             <?php endif; ?>
             <?php if($location): ?>
-                <span class="filter-tag"><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($location) ?> <a href="search.php?q=<?= $query ?>&category=<?= $category ?>&sort=<?= $sort ?>">&times;</a></span>
+                <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand/10 text-brand text-xs font-bold">
+                    <i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($location) ?> 
+                    <a href="search.php?q=<?= $query ?>&category=<?= $category ?>&sort=<?= $sort ?>" class="text-red-500 hover:text-red-700 ml-1 text-sm">&times;</a>
+                </span>
             <?php endif; ?>
         </div>
         <?php endif; ?>
     </div>
 
-    <div class="product-grid">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <?php if (count($results) > 0): ?>
             <?php foreach($results as $ad): ?>
-                <a href="ad.php?id=<?= $ad['id'] ?>" class="product-card glass-panel" style="display:block; color:inherit; text-decoration:none;">
-                    <button class="favorite-btn" onclick="event.preventDefault();"><i class="far fa-heart"></i></button>
-                    <span class="glass-pill" style="position: absolute; top: 10px; left: 10px; padding: 5px 12px; font-size: 11px; z-index: 10;"><?= htmlspecialchars($ad['category_name']) ?></span>
+                <a href="ad.php?id=<?= $ad['id'] ?>" class="group bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col relative block">
+                    <button class="absolute top-3 right-3 bg-white/90 backdrop-blur text-slate-400 w-9 h-9 rounded-full flex items-center justify-center shadow-sm hover:text-red-500 z-10 transition">
+                        <i class="far fa-heart text-lg"></i>
+                    </button>
+                    <span class="absolute top-3 left-3 bg-white/90 backdrop-blur font-bold text-slate-700 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider z-10 shadow-sm border border-slate-100">
+                        <?= htmlspecialchars($ad['category_name']) ?>
+                    </span>
+                    
                     <?php $img = $ad['main_image'] ? $ad['main_image'] : 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=500&q=60'; ?>
-                    <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($ad['title']) ?>" class="product-img">
-                    <div class="product-info">
-                        <div class="product-price">Rs <?= number_format($ad['price']) ?></div>
-                        <div class="product-title"><?= htmlspecialchars($ad['title']) ?></div>
-                        <div class="product-meta">
-                            <span><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($ad['location']) ?></span>
+                    <div class="aspect-[4/3] overflow-hidden border-b border-slate-100">
+                        <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($ad['title']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
+                    </div>
+                    <div class="p-4 flex flex-col flex-1">
+                        <div class="text-xl font-bold text-slate-900 mb-1">Rs <?= number_format($ad['price']) ?></div>
+                        <div class="text-sm text-slate-600 line-clamp-2 mb-4 flex-1 leading-snug"><?= htmlspecialchars($ad['title']) ?></div>
+                        <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wide flex justify-between items-center mt-auto">
+                            <span class="flex items-center gap-1 truncate max-w-[65%]"><i class="fas fa-map-marker-alt text-brand"></i> <?= htmlspecialchars($ad['location']) ?></span>
                             <span><?= date('M d', strtotime($ad['created_at'])) ?></span>
                         </div>
                     </div>
                 </a>
             <?php endforeach; ?>
         <?php else: ?>
-            <div style="grid-column: 1/-1; text-align: center; padding: 80px 30px; animation: fadeInUp 0.5s ease;">
-                <i class="fas fa-search" style="font-size: 56px; color: var(--glass-border); margin-bottom: 20px;"></i>
-                <h3 style="margin-bottom:8px;">No results found</h3>
-                <p style="color: var(--text-secondary); margin-bottom:25px;">Try broadening your search or removing some filters.</p>
-                <a href="search.php" class="btn-sell"><i class="fas fa-redo"></i> Clear Filters</a>
+            <div class="col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-4 bg-white border border-slate-200 border-dashed rounded-2xl p-16 text-center text-slate-500 flex flex-col items-center justify-center">
+                <i class="fas fa-search text-5xl mb-4 text-slate-300"></i>
+                <h3 class="text-xl font-bold text-slate-700 mb-2">No results found</h3>
+                <p class="mb-6">Try broadening your search or removing some filters.</p>
+                <a href="search.php" class="bg-white border border-slate-300 text-slate-700 font-bold px-6 py-2.5 rounded-full hover:bg-slate-50 transition flex items-center gap-2">
+                    <i class="fas fa-redo"></i> Clear Filters
+                </a>
             </div>
         <?php endif; ?>
     </div>
