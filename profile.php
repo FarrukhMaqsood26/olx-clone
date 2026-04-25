@@ -28,6 +28,7 @@ $myAds = $adsStmt->fetchAll();
 // Count stats
 $totalAds = count($myAds);
 $activeAds = count(array_filter($myAds, fn($a) => $a['status'] === 'active'));
+$pendingAds = count(array_filter($myAds, fn($a) => $a['status'] === 'pending'));
 $soldAds = count(array_filter($myAds, fn($a) => $a['status'] === 'sold'));
 
 // Count messages
@@ -92,6 +93,12 @@ include 'includes/header.php';
                         <?= $totalChats ?>
                     </div>
                     <div class="text-xs font-semibold text-blue-600 uppercase tracking-widest mt-1">Chats</div>
+                </div>
+                <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
+                    <div class="text-2xl font-extrabold text-amber-600">
+                        <?= $pendingAds ?>
+                    </div>
+                    <div class="text-xs font-semibold text-amber-600 uppercase tracking-widest mt-1">Pending</div>
                 </div>
             </div>
         </div>
@@ -162,6 +169,11 @@ include 'includes/header.php';
             class="profile-tab whitespace-nowrap pb-3 px-4 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-800"
             onclick="filterAds('active', this)">Active (
             <?= $activeAds ?>)
+        </button>
+        <button
+            class="profile-tab whitespace-nowrap pb-3 px-4 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-800"
+            onclick="filterAds('pending', this)">Pending (
+            <?= $pendingAds ?>)
         </button>
         <button
             class="profile-tab whitespace-nowrap pb-3 px-4 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-800"

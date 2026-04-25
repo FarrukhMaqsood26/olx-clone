@@ -9,9 +9,55 @@ require_once '../includes/config.php';
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 /**
+ * Returns a professionally designed HTML email template for OTP
+ */
+function get_auth_email_template($name, $otp) {
+    return '
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f9; color: #334155; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+            .header { background-color: #002f34; padding: 32px; text-align: center; }
+            .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.025em; text-transform: uppercase; }
+            .content { padding: 40px; text-align: center; }
+            .content h2 { font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 0; }
+            .content p { font-size: 16px; line-height: 1.6; color: #64748b; margin-bottom: 24px; }
+            .otp-box { background-color: #f1f5f9; border-radius: 12px; padding: 24px; margin: 24px 0; border: 2px dashed #002f34; }
+            .otp-code { font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #002f34; }
+            .footer { padding: 24px; text-align: center; font-size: 13px; color: #94a3b8; background-color: #f8fafc; }
+            .footer p { margin: 4px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>OLX CLONE</h1>
+            </div>
+            <div class="content">
+                <h2>Hello, '.htmlspecialchars($name).'!</h2>
+                <p>Welcome to Pakistan\'s largest local marketplace. To complete your account verification, please enter the following 6-digit code:</p>
+                <div class="otp-box">
+                    <div class="otp-code">'.$otp.'</div>
+                </div>
+                <p>Wait! If you didn\'t request this, simply ignore this email. This code is valid for a limited time only.</p>
+            </div>
+            <div class="footer">
+                <p>&copy; 2026 OLX Clone. All rights reserved.</p>
+                <p>This is an automated security notification. Please do not reply.</p>
+            </div>
+        </div>
+    </body>
+    </html>';
+}
+
+/**
  * Utility to send email via SMTP (PHPMailer)
  */
-function send_auth_email($to, $subject, $message) {
+function send_auth_email($to, $subject, $htmlContent, $plainTextVersion = '') {
     if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
         return false;
     }
@@ -31,7 +77,10 @@ function send_auth_email($to, $subject, $message) {
 
         $mail->isHTML(true);
         $mail->Subject = $subject;
-        $mail->Body    = $message;
+        $mail->Body    = $htmlContent;
+        if (!empty($plainTextVersion)) {
+            $mail->AltBody = $plainTextVersion;
+        }
 
         $mail->send();
         return true;
@@ -78,9 +127,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signup'])) {
 
     $stmt = $pdo->prepare("INSERT INTO users (name, username, email, phone, password, is_email_verified, verification_code, avatar) VALUES (?, ?, ?, ?, ?, 0, ?, ?)");
     if ($stmt->execute([$name, $username, $email, $phone, $password, $otp, $avatar_name])) {
-        // Send OTP
-        $msg = "Your OLX verification code is: <strong>$otp</strong>";
-        send_auth_email($email, "Verify Your Account", $msg);
+        // Send Polished HTML OTP Email
+        $htmlMsg = get_auth_email_template($name, $otp);
+        $plainMsg = "Hello $name, your OLX Clone verification code is: $otp";
+        send_auth_email($email, "Verify Your Account - $otp", $htmlMsg, $plainMsg);
         
         header("Location: ../verify-otp.php?email=" . urlencode($email));
         exit;
@@ -136,8 +186,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
             $pdo->prepare("UPDATE users SET verification_code = ? WHERE id = ?")->execute([$otp, $user['id']]);
             
-            $msg = "Your OLX verification code is: <strong>$otp</strong>";
-            send_auth_email($user['email'], "Verify Your Account", $msg);
+            // Send Polished HTML OTP Email
+            $htmlMsg = get_auth_email_template($user['name'], $otp);
+            $plainMsg = "Hello " . $user['name'] . ", your OLX Clone verification code is: $otp";
+            send_auth_email($user['email'], "Verify Your Account - $otp", $htmlMsg, $plainMsg);
             
             header("Location: ../verify-otp.php?email=" . urlencode($user['email']));
             exit;

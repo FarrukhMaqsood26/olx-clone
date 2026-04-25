@@ -74,22 +74,17 @@ include 'includes/header.php';
 
             <div>
                 <label class="block text-sm font-bold text-slate-700 mb-2">Upload Photos (Max 10)</label>
-                <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                    <?php for($i=0; $i<10; $i++): $id = "ad-img-".$i; ?>
-                    <label for="<?= $id ?>" class="relative aspect-square border-2 border-dashed border-slate-300 hover:border-brand bg-slate-50 rounded-xl flex flex-col items-center justify-center p-2 transition cursor-pointer group overflow-hidden">
-                        <input type="file" name="images[]" id="<?= $id ?>" accept="image/*" class="hidden img-input">
-                        <div class="text-center group-hover:text-brand transition-colors img-placeholder">
+                <div id="image-upload-container" class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                    <!-- Main Drop/Click Zone -->
+                    <label id="add-more-box" class="relative aspect-square border-2 border-dashed border-slate-300 hover:border-brand bg-slate-50 rounded-xl flex flex-col items-center justify-center p-2 transition cursor-pointer group overflow-hidden">
+                        <input type="file" id="file-upload-input" multiple accept="image/*" class="hidden">
+                        <div class="text-center group-hover:text-brand transition-colors">
                             <i class="fas fa-camera text-2xl text-slate-400 mb-1"></i>
-                            <p class="text-[10px] font-bold text-slate-500"><?= $i === 0 ? 'Main Photo' : 'Photo '.($i+1) ?></p>
+                            <p class="text-[10px] font-bold text-slate-500">Add Photo</p>
                         </div>
-                        <img src="" class="absolute inset-0 w-full h-full object-cover hidden img-preview">
-                        <button type="button" class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full text-[10px] items-center justify-center hidden remove-img z-20">
-                            <i class="fas fa-times"></i>
-                        </button>
                     </label>
-                    <?php endfor; ?>
                 </div>
-                <p class="text-[10px] text-slate-500 mt-3"><i class="fas fa-info-circle mr-1"></i> First photo will be the main listing image. Max 10 photos.</p>
+                <p class="text-[10px] text-slate-500 mt-3"><i class="fas fa-info-circle mr-1"></i> Drag and drop photos. First photo is your main image. Max 10.</p>
             </div>
 
             <div class="pt-6 mt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -107,53 +102,126 @@ include 'includes/header.php';
 
 <script>
 $(document).ready(function() {
-    // 10 IMAGE BOXES HANDLING
-    $('.img-input').change(function() {
-        const file = this.files[0];
-        const container = $(this).closest('.relative');
-        const preview = container.find('.img-preview');
-        const placeholder = container.find('.img-placeholder');
-        const removeBtn = container.find('.remove-img');
+    const MAX_IMAGES = 10;
+    let uploadedFiles = []; // Array of File objects
+    
+    const $container = $('#image-upload-container');
+    const $fileInput = $('#file-upload-input');
+    const $addMoreBox = $('#add-more-box');
+    const $form = $('#postAdForm');
 
-        if (file) {
+    // --- Dynamic Image Upload Logic ---
+
+    function renderPreviews() {
+        // Remove existing previews except the "add more" box
+        $container.find('.preview-card').remove();
+        
+        uploadedFiles.forEach((file, index) => {
             const reader = new FileReader();
+            const $card = $(`
+                <div class="preview-card relative aspect-square border border-slate-200 rounded-xl overflow-hidden shadow-sm group">
+                    <img src="" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-2">
+                         <button type="button" class="remove-btn bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition" data-index="${index}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                    ${index === 0 ? '<span class="absolute bottom-1 left-1 bg-brand text-white text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">Main</span>' : ''}
+                </div>
+            `);
+            
             reader.onload = function(e) {
-                preview.attr('src', e.target.result).show();
-                placeholder.hide();
-                removeBtn.css('display', 'flex');
-            }
+                $card.find('img').attr('src', e.target.result);
+            };
             reader.readAsDataURL(file);
+            
+            // Insert before the "add more" box
+            $addMoreBox.before($card);
+        });
+
+        // Hide/Show "add more" box based on limit
+        if (uploadedFiles.length >= MAX_IMAGES) {
+            $addMoreBox.hide();
+        } else {
+            $addMoreBox.show();
         }
+    }
+
+    $fileInput.on('change', function(e) {
+        const files = Array.from(e.target.files);
+        addFiles(files);
+        $(this).val(''); // Reset input
     });
 
-    $('.remove-img').click(function(e) {
+    function addFiles(files) {
+        const remaining = MAX_IMAGES - uploadedFiles.length;
+        files.slice(0, remaining).forEach(file => {
+            if (file.type.match('image.*')) {
+                uploadedFiles.push(file);
+            }
+        });
+        renderPreviews();
+    }
+
+    // Drag and Drop
+    $addMoreBox.on('dragover', function(e) {
         e.preventDefault();
-        const container = $(this).closest('.relative');
-        container.find('.img-input').val('');
-        container.find('.img-preview').hide().attr('src', '');
-        container.find('.img-placeholder').show();
-        $(this).hide();
+        $(this).addClass('border-brand bg-brand/5');
     });
 
-    // NOMINATIM ADDRESS AUTOCOMPLETE
-    let debounceTimer;
+    $addMoreBox.on('dragleave', function(e) {
+        e.preventDefault();
+        $(this).removeClass('border-brand bg-brand/5');
+    });
+
+    $addMoreBox.on('drop', function(e) {
+        e.preventDefault();
+        $(this).removeClass('border-brand bg-brand/5');
+        const files = Array.from(e.originalEvent.dataTransfer.files);
+        addFiles(files);
+    });
+
+    // Remove Image
+    $container.on('click', '.remove-btn', function() {
+        const index = $(this).data('index');
+        uploadedFiles.splice(index, 1);
+        renderPreviews();
+    });
+
+    // --- OpenStreetMap (Nominatim) Geocoding Logic ---
+    let nominatimDebounce;
+    
     $('#locationInput').on('input', function() {
-        clearTimeout(debounceTimer);
         const query = $(this).val();
+        clearTimeout(nominatimDebounce);
         
         if (query.length < 3) {
             $('#addressSuggestions').hide();
             return;
         }
 
-        debounceTimer = setTimeout(() => {
-            $.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=pk`, function(data) {
+        nominatimDebounce = setTimeout(() => {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=pk&addressdetails=1&limit=5`;
+            
+            $.get(url, function(data) {
                 let html = '';
-                if (data.length > 0) {
+                if (data && data.length > 0) {
                     data.forEach(item => {
-                        html += `<div class="suggestion-item p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 text-sm" data-name="${item.display_name}">
-                            <i class="fas fa-map-marker-alt text-brand mr-2"></i> ${item.display_name}
-                        </div>`;
+                        // Better parsing of Nominatim results for a premium feel
+                        const parts = item.display_name.split(', ');
+                        const mainTitle = parts[0];
+                        const subTitle = parts.slice(1).join(', ');
+                        
+                        html += `
+                            <div class="suggestion-item p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 flex items-start gap-3" data-name="${item.display_name}">
+                                <div class="mt-1 w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-brand flex-shrink-0">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <div class="font-bold text-slate-900 text-sm truncate">${mainTitle}</div>
+                                    <div class="text-[11px] text-slate-500 truncate">${subTitle}</div>
+                                </div>
+                            </div>`;
                     });
                     $('#addressSuggestions').html(html).show();
                 } else {
@@ -170,20 +238,57 @@ $(document).ready(function() {
         $('#addressSuggestions').hide();
     });
 
-    // Close suggestions on click outside
     $(document).click(function(e) {
         if (!$(e.target).closest('#addressSuggestions, #locationInput').length) {
             $('#addressSuggestions').hide();
         }
     });
 
-    // Final Form Validation
-    $('#postAdForm').submit(function(e) {
+    // Final Form Submission
+    $form.submit(function(e) {
         if ($('#validLocation').val() === "") {
             e.preventDefault();
-            alert("Please pick a valid address from the suggestions list.");
-            $('#locationInput').focus();
+            alert("Please select a location from the dropdown suggestions.");
+            return;
         }
+
+        // Attach files to FormData manually since we use a custom array
+        e.preventDefault();
+        const $btn = $(this).find('button[type="submit"]');
+        const originalBtnHtml = $btn.html();
+        
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Posting...');
+        
+        const formData = new FormData(this);
+        
+        // Remove empty images[] entries if any
+        formData.delete('images[]');
+        
+        uploadedFiles.forEach(file => {
+            formData.append('images[]', file);
+        });
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json', // Expect JSON
+            success: function(response) {
+                if (response.success) {
+                    window.location.href = 'profile.php?success=ad_posted';
+                } else {
+                    alert('Error: ' + (response.message || 'Unknown error occurred'));
+                    $btn.prop('disabled', false).html(originalBtnHtml);
+                }
+            },
+            error: function(xhr) {
+                console.error(xhr.responseText);
+                alert('An error occurred while communicating with the server.');
+                $btn.prop('disabled', false).html(originalBtnHtml);
+            }
+        });
     });
 });
 </script>

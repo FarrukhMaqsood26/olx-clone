@@ -42,18 +42,19 @@ if ($action == 'create' && $_SERVER["REQUEST_METHOD"] == "POST") {
             if (!is_dir($upload_dir))
                 mkdir($upload_dir, 0755, true);
 
-            $file_count = count($_FILES['images']['name']);
+            // Handle both multiple and single file uploads depending on input name
+            $files = $_FILES['images'];
+            $file_count = is_array($files['name']) ? count($files['name']) : 1;
             $is_primary = true; 
 
             for ($i = 0; $i < $file_count; $i++) {
-                if (empty($_FILES['images']['name'][$i])) continue; // Skip empty boxes
+                $file_name = is_array($files['name']) ? $files['name'][$i] : $files['name'];
+                if (empty($file_name)) continue;
 
-                $tmp_name = $_FILES['images']['tmp_name'][$i];
-                $file_name = basename($_FILES['images']['name'][$i]);
-                $file_size = $_FILES['images']['size'][$i];
-                $file_error = $_FILES['images']['error'][$i];
+                $tmp_name = is_array($files['tmp_name']) ? $files['tmp_name'][$i] : $files['tmp_name'];
+                $file_size = is_array($files['size']) ? $files['size'][$i] : $files['size'];
+                $file_error = is_array($files['error']) ? $files['error'][$i] : $files['error'];
 
-                // Allow only specific formats
                 $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
                 $allowed = ['jpg', 'jpeg', 'png', 'webp'];
 
@@ -64,19 +65,30 @@ if ($action == 'create' && $_SERVER["REQUEST_METHOD"] == "POST") {
                     if (move_uploaded_file($tmp_name, $dest_path)) {
                         $img_stmt = $pdo->prepare("INSERT INTO ad_images (ad_id, image_path, is_primary) VALUES (?, ?, ?)");
                         $img_stmt->execute([$ad_id, 'assets/uploads/' . $new_file_name, $is_primary ? 1 : 0]);
-                        $is_primary = false; // Only first successful upload is primary
+                        $is_primary = false;
                     }
                 }
             }
         }
 
         $pdo->commit();
-        header("Location: ../index.php?success=ad_posted");
+        
+        // Return JSON if AJAX, otherwise redirect
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            echo json_encode(['success' => true, 'id' => $ad_id]);
+        } else {
+            header("Location: ../profile.php?success=ad_posted");
+        }
         exit;
 
     } catch (Exception $e) {
-        $pdo->rollBack();
-        die("Error posting ad: " . $e->getMessage());
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        } else {
+            die("Error posting ad: " . $e->getMessage());
+        }
+        exit;
     }
 }
 
@@ -166,5 +178,3 @@ if ($action == 'reactivate') {
     header("Location: ../profile.php?success=ad_updated");
     exit;
 }
-
-?>
