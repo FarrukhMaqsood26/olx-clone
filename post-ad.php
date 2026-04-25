@@ -75,9 +75,9 @@ include 'includes/header.php';
             <div>
                 <label class="block text-sm font-bold text-slate-700 mb-2">Upload Photos (Max 10)</label>
                 <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                    <?php for($i=0; $i<10; $i++): ?>
-                    <div class="relative aspect-square border-2 border-dashed border-slate-300 hover:border-brand bg-slate-50 rounded-xl flex flex-col items-center justify-center p-2 transition cursor-pointer group overflow-hidden">
-                        <input type="file" name="images[]" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 img-input">
+                    <?php for($i=0; $i<10; $i++): $id = "ad-img-".$i; ?>
+                    <label for="<?= $id ?>" class="relative aspect-square border-2 border-dashed border-slate-300 hover:border-brand bg-slate-50 rounded-xl flex flex-col items-center justify-center p-2 transition cursor-pointer group overflow-hidden">
+                        <input type="file" name="images[]" id="<?= $id ?>" accept="image/*" class="hidden img-input">
                         <div class="text-center group-hover:text-brand transition-colors img-placeholder">
                             <i class="fas fa-camera text-2xl text-slate-400 mb-1"></i>
                             <p class="text-[10px] font-bold text-slate-500"><?= $i === 0 ? 'Main Photo' : 'Photo '.($i+1) ?></p>
@@ -86,7 +86,7 @@ include 'includes/header.php';
                         <button type="button" class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full text-[10px] items-center justify-center hidden remove-img z-20">
                             <i class="fas fa-times"></i>
                         </button>
-                    </div>
+                    </label>
                     <?php endfor; ?>
                 </div>
                 <p class="text-[10px] text-slate-500 mt-3"><i class="fas fa-info-circle mr-1"></i> First photo will be the main listing image. Max 10 photos.</p>

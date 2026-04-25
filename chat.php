@@ -77,7 +77,7 @@ include 'includes/header.php';
                         </div>
 
                         <!-- Add Attachment -->
-                        <label class="w-10 h-10 rounded-full text-slate-500 hover:bg-slate-100 hover:text-brand flex items-center justify-center cursor-pointer transition flex-shrink-0">
+                        <label for="fileInput" class="w-10 h-10 rounded-full text-slate-500 hover:bg-slate-100 hover:text-brand flex items-center justify-center cursor-pointer transition flex-shrink-0">
                             <i class="fas fa-paperclip text-lg"></i>
                             <input type="file" id="fileInput" class="hidden" accept="image/*,audio/*">
                         </label>
@@ -128,7 +128,10 @@ $(document).ready(function() {
     $('#sendBtn').click(sendTextMessage);
     $('#msgInput').keypress(e => { if(e.which == 13) sendTextMessage(); });
     $('#fileInput').change(function() {
-        if (this.files && this.files[0]) sendFile(this.files[0]);
+        if (this.files && this.files[0]) {
+            console.log('File selected:', this.files[0].name);
+            sendFile(this.files[0]);
+        }
     });
 
     // Mic Button Logic
@@ -164,29 +167,46 @@ if (window.innerWidth < 768) {
 }
 
 function startRecording() {
-    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
+    let mimeType = 'audio/webm';
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/ogg';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = ''; // Let the browser decide
+        }
+    }
+
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
-            mediaRecorder = new MediaRecorder(stream, { mimeType });
+            const options = mimeType ? { mimeType } : {};
+            mediaRecorder = new MediaRecorder(stream, options);
             mediaRecorder.start();
             audioChunks = [];
             
             $('#recordingBar').css('display', 'flex');
             
             mediaRecorder.addEventListener("dataavailable", event => {
-                audioChunks.push(event.data);
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
             });
 
             mediaRecorder.addEventListener("stop", () => {
-                const audioBlob = new Blob(audioChunks, { type: mimeType });
-                const extension = mimeType.split('/')[1].split(';')[0];
-                const audioFile = new File([audioBlob], `voice_message.${extension}`, { type: mimeType });
+                const finalMime = mediaRecorder.mimeType || 'audio/webm';
+                const audioBlob = new Blob(audioChunks, { type: finalMime });
+                
+                // Extract extension from mime type
+                let ext = 'webm';
+                if (finalMime.includes('ogg')) ext = 'ogg';
+                if (finalMime.includes('mp4')) ext = 'mp4';
+                
+                const audioFile = new File([audioBlob], `recording.${ext}`, { type: finalMime });
                 sendFile(audioFile);
+                
                 stream.getTracks().forEach(track => track.stop());
             });
         }).catch(err => {
-            console.error(err);
-            alert('Microphone access denied or not available. Please ensure you are on HTTPS.');
+            console.error('Error accessing microphone:', err);
+            alert('Could not access microphone. Please ensure you have granted permission and are using a secure connection (HTTPS or localhost).');
         });
 }
 
@@ -282,10 +302,24 @@ function sendTextMessage() {
 }
 
 function sendFile(file) {
+    if (!currentPartnerId) {
+        alert("Please select a conversation first.");
+        return;
+    }
+
     const formData = new FormData();
     formData.append('receiver_id', currentPartnerId);
     formData.append('attachment', file);
     formData.append('is_ajax', 1);
+
+    // Show a temporary sending indicator
+    const tempId = Date.now();
+    $('#chatThread').append(`
+        <div class="self-end bg-slate-200 text-slate-500 rounded-2xl px-4 py-2 text-sm italic animate-pulse" id="temp-${tempId}">
+            Sending attachment...
+        </div>
+    `);
+    scrollToBottom();
 
     $.ajax({
         url: 'api/messages.php?action=send',
@@ -293,9 +327,16 @@ function sendFile(file) {
         data: formData,
         contentType: false,
         processData: false,
-        success: function() {
+        success: function(response) {
+            $(`#temp-${tempId}`).remove();
             pollNewMessages();
             $('#fileInput').val('');
+            loadConversations(); // Update sidebar last message
+        },
+        error: function(xhr) {
+            $(`#temp-${tempId}`).remove();
+            console.error('Upload Error:', xhr.responseText);
+            alert('Failed to send file. Please check if the file size is too large or if the folder is writable.');
         }
     });
 }

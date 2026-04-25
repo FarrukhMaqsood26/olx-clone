@@ -21,20 +21,37 @@ if ($action == 'send' && $_SERVER['REQUEST_METHOD'] == 'POST') {
     // Handle File Uploads (Image or Audio)
     if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = '../assets/uploads/chat/';
-        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, true);
+        }
 
-        $file_name = time() . '_' . basename($_FILES['attachment']['name']);
+        $orig_name = basename($_FILES['attachment']['name']);
+        $file_ext = strtolower(pathinfo($orig_name, PATHINFO_EXTENSION));
+        
+        // If no extension (blobs), try to guess from mime type
+        if (empty($file_ext)) {
+            $mime = $_FILES['attachment']['type'];
+            if (strpos($mime, 'image/') === 0) $file_ext = str_replace('image/', '', $mime);
+            elseif (strpos($mime, 'audio/') === 0) {
+                $file_ext = 'webm'; // default for browser recordings
+                if ($mime == 'audio/ogg') $file_ext = 'ogg';
+                if ($mime == 'audio/mpeg') $file_ext = 'mp3';
+            }
+        }
+
+        $file_name = time() . '_' . uniqid() . '.' . $file_ext;
         $target_file = $upload_dir . $file_name;
-        $file_ext = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-        // Determine file type
+        // Determine file type category
         $image_exts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-        $audio_exts = ['mp3', 'wav', 'ogg', 'm4a', 'webm'];
+        $audio_exts = ['mp3', 'wav', 'ogg', 'm4a', 'webm', 'mp4', 'aac'];
 
         if (in_array($file_ext, $image_exts)) {
             $file_type = 'image';
         } elseif (in_array($file_ext, $audio_exts)) {
             $file_type = 'audio';
+        } else {
+            $file_type = 'file';
         }
 
         if (move_uploaded_file($_FILES['attachment']['tmp_name'], $target_file)) {
