@@ -168,6 +168,7 @@ if (isset($_GET['error'])) {
         'email_not_found' => 'Email not found.',
         'invalid_token' => 'Invalid reset link.',
         'invalid_otp' => 'Incorrect OTP.',
+        'already_exists' => 'Username, Email, or Phone already in use.',
     ];
     $err = isset($error_messages[$_GET['error']]) ? $error_messages[$_GET['error']] : 'An error occurred.';
     echo '<div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-medium"><i class="fas fa-exclamation-circle text-red-500"></i> ' . $err . '</div>';

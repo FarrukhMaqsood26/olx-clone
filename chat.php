@@ -164,9 +164,10 @@ if (window.innerWidth < 768) {
 }
 
 function startRecording() {
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg';
     navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
-            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder = new MediaRecorder(stream, { mimeType });
             mediaRecorder.start();
             audioChunks = [];
             
@@ -177,13 +178,15 @@ function startRecording() {
             });
 
             mediaRecorder.addEventListener("stop", () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                const audioFile = new File([audioBlob], "voice_message.webm", { type: 'audio/webm' });
+                const audioBlob = new Blob(audioChunks, { type: mimeType });
+                const extension = mimeType.split('/')[1].split(';')[0];
+                const audioFile = new File([audioBlob], `voice_message.${extension}`, { type: mimeType });
                 sendFile(audioFile);
                 stream.getTracks().forEach(track => track.stop());
             });
         }).catch(err => {
-            alert('Could not access microphone: ' + err);
+            console.error(err);
+            alert('Microphone access denied or not available. Please ensure you are on HTTPS.');
         });
 }
 

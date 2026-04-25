@@ -1,4 +1,16 @@
-<?php include 'includes/header.php'; ?>
+<?php 
+require_once 'includes/config.php';
+if (isset($_SESSION['user_id'])) {
+    $role = isset($_SESSION['user_role']) ? strtolower(trim($_SESSION['user_role'])) : 'user';
+    if ($role === 'admin') {
+        header("Location: admin/index.php");
+    } else {
+        header("Location: index.php");
+    }
+    exit;
+}
+include 'includes/header.php'; 
+?>
 
 <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
@@ -13,6 +25,12 @@
             <div>
                 <label for="signup-name" class="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
                 <input type="text" name="name" id="signup-name" required placeholder="Enter your full name" 
+                    class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition text-slate-800">
+            </div>
+
+            <div>
+                <label for="signup-username" class="block text-sm font-medium text-slate-700 mb-2">Username</label>
+                <input type="text" name="username" id="signup-username" required placeholder="Pick a unique username" 
                     class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition text-slate-800">
             </div>
             

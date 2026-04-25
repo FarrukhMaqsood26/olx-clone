@@ -61,21 +61,35 @@ include 'includes/header.php';
                         class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand/20 outline-none text-slate-800 transition">
                 </div>
                 
-                <div>
+                <div class="relative">
                     <label class="block text-sm font-bold text-slate-700 mb-2">Location <span class="text-red-500">*</span></label>
-                    <input type="text" name="location" placeholder="e.g. DHA Phase 5, Lahore" required 
-                        class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand/20 outline-none text-slate-800 transition">
+                    <div class="relative">
+                        <input type="text" name="location" id="locationInput" placeholder="Start typing your address..." required autocomplete="off"
+                            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand/20 outline-none text-slate-800 transition">
+                        <div id="addressSuggestions" class="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl hidden max-h-60 overflow-y-auto"></div>
+                    </div>
+                    <input type="hidden" name="valid_location" id="validLocation" value="">
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 mb-2">Upload Photos (up to 5)</label>
-                <div class="relative border-2 border-dashed border-slate-300 hover:border-brand bg-slate-50 hover:bg-brand/5 rounded-xl p-8 text-center transition cursor-pointer group">
-                    <i class="fas fa-cloud-upload-alt text-4xl text-slate-400 group-hover:text-brand mb-3 transition"></i>
-                    <p class="font-bold text-slate-700 mb-1">Click to upload photos</p>
-                    <p class="text-xs text-slate-500">JPG, PNG or WEBP • Max 5MB each</p>
-                    <input type="file" name="images[]" multiple accept="image/jpeg,image/png,image/webp" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                <label class="block text-sm font-bold text-slate-700 mb-2">Upload Photos (Max 10)</label>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                    <?php for($i=0; $i<10; $i++): ?>
+                    <div class="relative aspect-square border-2 border-dashed border-slate-300 hover:border-brand bg-slate-50 rounded-xl flex flex-col items-center justify-center p-2 transition cursor-pointer group overflow-hidden">
+                        <input type="file" name="images[]" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10 img-input">
+                        <div class="text-center group-hover:text-brand transition-colors img-placeholder">
+                            <i class="fas fa-camera text-2xl text-slate-400 mb-1"></i>
+                            <p class="text-[10px] font-bold text-slate-500"><?= $i === 0 ? 'Main Photo' : 'Photo '.($i+1) ?></p>
+                        </div>
+                        <img src="" class="absolute inset-0 w-full h-full object-cover hidden img-preview">
+                        <button type="button" class="absolute top-1 right-1 bg-red-500 text-white w-5 h-5 rounded-full text-[10px] items-center justify-center hidden remove-img z-20">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <?php endfor; ?>
                 </div>
+                <p class="text-[10px] text-slate-500 mt-3"><i class="fas fa-info-circle mr-1"></i> First photo will be the main listing image. Max 10 photos.</p>
             </div>
 
             <div class="pt-6 mt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -90,5 +104,88 @@ include 'includes/header.php';
         </form>
     </div>
 </main>
+
+<script>
+$(document).ready(function() {
+    // 10 IMAGE BOXES HANDLING
+    $('.img-input').change(function() {
+        const file = this.files[0];
+        const container = $(this).closest('.relative');
+        const preview = container.find('.img-preview');
+        const placeholder = container.find('.img-placeholder');
+        const removeBtn = container.find('.remove-img');
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.attr('src', e.target.result).show();
+                placeholder.hide();
+                removeBtn.css('display', 'flex');
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    $('.remove-img').click(function(e) {
+        e.preventDefault();
+        const container = $(this).closest('.relative');
+        container.find('.img-input').val('');
+        container.find('.img-preview').hide().attr('src', '');
+        container.find('.img-placeholder').show();
+        $(this).hide();
+    });
+
+    // NOMINATIM ADDRESS AUTOCOMPLETE
+    let debounceTimer;
+    $('#locationInput').on('input', function() {
+        clearTimeout(debounceTimer);
+        const query = $(this).val();
+        
+        if (query.length < 3) {
+            $('#addressSuggestions').hide();
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            $.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=pk`, function(data) {
+                let html = '';
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        html += `<div class="suggestion-item p-3 hover:bg-slate-50 cursor-pointer border-b border-slate-100 last:border-0 text-sm" data-name="${item.display_name}">
+                            <i class="fas fa-map-marker-alt text-brand mr-2"></i> ${item.display_name}
+                        </div>`;
+                    });
+                    $('#addressSuggestions').html(html).show();
+                } else {
+                    $('#addressSuggestions').hide();
+                }
+            });
+        }, 500);
+    });
+
+    $(document).on('click', '.suggestion-item', function() {
+        const name = $(this).data('name');
+        $('#locationInput').val(name);
+        $('#validLocation').val(name);
+        $('#addressSuggestions').hide();
+    });
+
+    // Close suggestions on click outside
+    $(document).click(function(e) {
+        if (!$(e.target).closest('#addressSuggestions, #locationInput').length) {
+            $('#addressSuggestions').hide();
+        }
+    });
+
+    // Final Form Validation
+    $('#postAdForm').submit(function(e) {
+        if ($('#validLocation').val() === "") {
+            e.preventDefault();
+            alert("Please pick a valid address from the suggestions list.");
+            $('#locationInput').focus();
+        }
+    });
+});
+</script>
 
 <?php include 'includes/footer.php'; ?>

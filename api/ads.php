@@ -31,21 +31,23 @@ if ($action == 'create' && $_SERVER["REQUEST_METHOD"] == "POST") {
         $pdo->beginTransaction();
 
         // Insert Ad
-        $stmt = $pdo->prepare("INSERT INTO ads (user_id, category_id, title, description, price, condition_type, location, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'active')");
+        $stmt = $pdo->prepare("INSERT INTO ads (user_id, category_id, title, description, price, condition_type, location, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')");
         $stmt->execute([$user_id, $category_id, $title, $description, $price, $condition_type, $location]);
 
         $ad_id = $pdo->lastInsertId();
 
         // Handle file uploads
-        if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
-            $upload_dir = '../uploads/';
+        if (isset($_FILES['images'])) {
+            $upload_dir = '../assets/uploads/';
             if (!is_dir($upload_dir))
                 mkdir($upload_dir, 0755, true);
 
             $file_count = count($_FILES['images']['name']);
-            $is_primary = true; // First image is primary
+            $is_primary = true; 
 
             for ($i = 0; $i < $file_count; $i++) {
+                if (empty($_FILES['images']['name'][$i])) continue; // Skip empty boxes
+
                 $tmp_name = $_FILES['images']['tmp_name'][$i];
                 $file_name = basename($_FILES['images']['name'][$i]);
                 $file_size = $_FILES['images']['size'][$i];
@@ -61,8 +63,8 @@ if ($action == 'create' && $_SERVER["REQUEST_METHOD"] == "POST") {
 
                     if (move_uploaded_file($tmp_name, $dest_path)) {
                         $img_stmt = $pdo->prepare("INSERT INTO ad_images (ad_id, image_path, is_primary) VALUES (?, ?, ?)");
-                        $img_stmt->execute([$ad_id, 'uploads/' . $new_file_name, $is_primary ? 1 : 0]);
-                        $is_primary = false;
+                        $img_stmt->execute([$ad_id, 'assets/uploads/' . $new_file_name, $is_primary ? 1 : 0]);
+                        $is_primary = false; // Only first successful upload is primary
                     }
                 }
             }
@@ -115,7 +117,7 @@ if ($action == 'delete') {
         $images = $imgStmt->fetchAll();
         foreach ($images as $img) {
             $filepath = '../' . $img['image_path'];
-            if (file_exists($filepath) && strpos($img['image_path'], 'uploads/') === 0) {
+            if (file_exists($filepath) && strpos($img['image_path'], 'assets/uploads/') === 0) {
                 unlink($filepath);
             }
         }

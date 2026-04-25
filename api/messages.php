@@ -20,7 +20,7 @@ if ($action == 'send' && $_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Handle File Uploads (Image or Audio)
     if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = '../uploads/chat/';
+        $upload_dir = '../assets/uploads/chat/';
         if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
         $file_name = time() . '_' . basename($_FILES['attachment']['name']);
@@ -38,7 +38,7 @@ if ($action == 'send' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         if (move_uploaded_file($_FILES['attachment']['tmp_name'], $target_file)) {
-            $file_path = 'uploads/chat/' . $file_name;
+            $file_path = 'assets/uploads/chat/' . $file_name;
         }
     }
 
