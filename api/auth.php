@@ -1,19 +1,44 @@
 <?php
 // api/auth.php
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 require_once '../includes/config.php';
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
 /**
- * Utility to send email, with fallback to simulation
+ * Utility to send email via SMTP (PHPMailer)
  */
 function send_auth_email($to, $subject, $message) {
-    $headers = "From: no-reply@olx-clone.local\r\n";
-    $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+    if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+        return false;
+    }
     
+    $mail = new PHPMailer(true);
     try {
-        @mail($to, $subject, $message, $headers);
-    } catch (Exception $e) {}
+        $mail->isSMTP();
+        $mail->Host       = SMTP_HOST;
+        $mail->SMTPAuth   = true;
+        $mail->Username   = SMTP_USER;
+        $mail->Password   = SMTP_PASS;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = SMTP_PORT;
+
+        $mail->setFrom(SMTP_USER, 'OLX Clone Verification');
+        $mail->addAddress($to);
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $message;
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Message could not be sent. Mailer Error: {$mail->ErrorInfo}");
+        return false;
+    }
 }
 
 // ---------------------------------------------------------
@@ -39,13 +64,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signup'])) {
     // Generate 6-digit OTP
     $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
     
-    $stmt = $pdo->prepare("INSERT INTO users (name, username, email, phone, password, is_email_verified, verification_code) VALUES (?, ?, ?, ?, ?, 0, ?)");
-    if ($stmt->execute([$name, $username, $email, $phone, $password, $otp])) {
+    // Handle Avatar Upload
+    $avatar_name = 'default.png';
+    if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, $allowed) && $_FILES['avatar']['size'] <= 5 * 1024 * 1024) { // 5MB limit
+            $avatar_name = time() . '_' . uniqid() . '.' . $ext;
+            if (!is_dir('../uploads/avatars/')) mkdir('../uploads/avatars/', 0777, true);
+            move_uploaded_file($_FILES['avatar']['tmp_name'], '../uploads/avatars/' . $avatar_name);
+        }
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO users (name, username, email, phone, password, is_email_verified, verification_code, avatar) VALUES (?, ?, ?, ?, ?, 0, ?, ?)");
+    if ($stmt->execute([$name, $username, $email, $phone, $password, $otp, $avatar_name])) {
         // Send OTP
         $msg = "Your OLX verification code is: <strong>$otp</strong>";
         send_auth_email($email, "Verify Your Account", $msg);
         
-        header("Location: ../verify-otp.php?email=" . urlencode($email) . "&simulated_otp=" . $otp);
+        header("Location: ../verify-otp.php?email=" . urlencode($email));
         exit;
     } else {
         header("Location: ../signup.php?error=registration_failed");
@@ -102,7 +139,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             $msg = "Your OLX verification code is: <strong>$otp</strong>";
             send_auth_email($user['email'], "Verify Your Account", $msg);
             
-            header("Location: ../verify-otp.php?email=" . urlencode($user['email']) . "&simulated_otp=" . $otp);
+            header("Location: ../verify-otp.php?email=" . urlencode($user['email']));
             exit;
         }
 
@@ -187,7 +224,59 @@ if ($action == 'google_callback') {
     }
 }
 
-// 5. LOGOUT
+// ---------------------------------------------------------
+// 5. UPDATE PROFILE
+// ---------------------------------------------------------
+
+if ($action == 'update_profile' && $_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: ../login.php");
+        exit;
+    }
+
+    $user_id = $_SESSION['user_id'];
+    $name = sanitize_input($_POST['name']);
+    $phone = sanitize_input($_POST['phone']);
+    $new_password = $_POST['new_password'];
+
+    $update_query = "UPDATE users SET name = ?, phone = ?";
+    $params = [$name, $phone];
+
+    if (!empty($new_password)) {
+        $update_query .= ", password = ?";
+        $params[] = password_hash($new_password, PASSWORD_DEFAULT);
+    }
+
+    // Handle File Upload
+    if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, $allowed) && $_FILES['avatar']['size'] <= 5 * 1024 * 1024) {
+            $avatar_name = time() . '_' . uniqid() . '.' . $ext;
+            if (!is_dir('../uploads/avatars/')) mkdir('../uploads/avatars/', 0777, true);
+            if (move_uploaded_file($_FILES['avatar']['tmp_name'], '../uploads/avatars/' . $avatar_name)) {
+                $update_query .= ", avatar = ?";
+                $params[] = $avatar_name;
+            }
+        }
+    }
+
+    $update_query .= " WHERE id = ?";
+    $params[] = $user_id;
+
+    $stmt = $pdo->prepare($update_query);
+    if ($stmt->execute($params)) {
+        $_SESSION['user_name'] = $name;
+        header("Location: ../profile.php?success=profile_updated");
+    } else {
+        header("Location: ../profile.php?error=update_failed");
+    }
+    exit;
+}
+
+// ---------------------------------------------------------
+// 6. LOGOUT
+// ---------------------------------------------------------
 if ($action == 'logout') {
     session_unset();
     session_destroy();

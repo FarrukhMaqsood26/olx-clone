@@ -19,7 +19,7 @@ include 'includes/header.php';
             <p class="text-slate-500">Join the largest local marketplace today.</p>
         </div>
         
-        <form action="api/auth.php" method="POST" class="space-y-5">
+        <form action="api/auth.php" method="POST" class="space-y-5" enctype="multipart/form-data">
             <input type="hidden" name="signup" value="1">
             
             <div>
@@ -52,6 +52,11 @@ include 'includes/header.php';
                     class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition text-slate-800">
             </div>
             
+            <div>
+                <label for="signup-avatar" class="block text-sm font-medium text-slate-700 mb-2">Profile Picture (Optional)</label>
+                <input type="file" name="avatar" id="signup-avatar" accept="image/*" 
+                    class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer text-slate-600">
+            </div>
             <button type="submit" id="signup-submit" class="w-full bg-brand hover:bg-brand-light text-white font-bold py-3.5 px-4 rounded-lg shadow-sm transition">
                 Sign Up
             </button>
