@@ -37,12 +37,14 @@ if (isset($_SESSION['user_id'])) {
                 extend: {
                     colors: {
                         brand: {
-                            DEFAULT: '#002f34',
-                            light: '#00464e',
+                            DEFAULT: '#050505', // Pitch Black
+                            light: '#111111',
+                            dark: '#000000',
                         },
                         accent: {
-                            DEFAULT: '#3a77ff',
-                            hover: '#2960da'
+                            DEFAULT: '#ff2d55', // Hot Neon Pink
+                            hover: '#e0244a',
+                            vibrant: '#ffcc00' // Neon Yellow/Gold
                         }
                     },
                     fontFamily: {
@@ -188,7 +190,21 @@ if (isset($_GET['success'])) {
         'email_sent' => 'Reset link sent! Please check your email.'
     ];
     $msg = isset($success_messages[$_GET['success']]) ? $success_messages[$_GET['success']] : 'Success.';
-    echo '<div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-medium"><i class="fas fa-check-circle text-green-500"></i> ' . $msg . '</div>';
+    echo '<div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-medium shadow-sm"><i class="fas fa-check-circle text-green-500"></i> ' . $msg . '</div>';
 }
 ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.bg-red-50, .bg-green-50');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.6s ease, transform 0.6s ease, margin 0.6s ease';
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-20px)';
+            alert.style.margin = '0';
+            setTimeout(() => alert.remove(), 600);
+        }, 1500); // 1.5s for a slightly more natural feel than strict 1s
+    });
+});
+</script>
 </div>

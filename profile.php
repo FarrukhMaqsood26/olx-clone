@@ -27,6 +27,7 @@ $myAds = $adsStmt->fetchAll();
 
 // Count stats
 $totalAds = count($myAds);
+
 $activeAds = count(array_filter($myAds, fn($a) => $a['status'] === 'active'));
 $pendingAds = count(array_filter($myAds, fn($a) => $a['status'] === 'pending'));
 $soldAds = count(array_filter($myAds, fn($a) => $a['status'] === 'sold'));
@@ -39,14 +40,16 @@ $totalChats = $msgStmt->fetchColumn();
 include 'includes/header.php';
 ?>
 
-<main class="flex-grow py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full bg-red">
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
 
     <!-- Profile Header -->
     <div
         class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8 mb-8 flex flex-col md:flex-row items-center md:items-start gap-6 relative">
-        <div class="w-24 h-24 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm border border-slate-100 bg-brand/10 text-brand relative group">
+        <div
+            class="w-24 h-24 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm border border-slate-100 bg-brand/10 text-brand relative group">
             <?php if (!empty($user['avatar']) && $user['avatar'] !== 'default.png' && file_exists('uploads/avatars/' . $user['avatar'])): ?>
-                <img src="uploads/avatars/<?= htmlspecialchars($user['avatar']) ?>" alt="Profile Picture" class="w-full h-full object-cover">
+                <img src="uploads/avatars/<?= htmlspecialchars($user['avatar']) ?>" alt="Profile Picture"
+                    class="w-full h-full object-cover">
             <?php else: ?>
                 <i class="fas fa-user text-4xl"></i>
             <?php endif; ?>
@@ -128,8 +131,8 @@ include 'includes/header.php';
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
-                    <input type="text" name="phone" id="profile-phone" value="<?= htmlspecialchars($user['phone'] ?? '') ?>"
-                        placeholder="03xx-xxxxxxx"
+                    <input type="text" name="phone" id="profile-phone"
+                        value="<?= htmlspecialchars($user['phone'] ?? '') ?>" placeholder="03xx-xxxxxxx"
                         pattern="^((\+92)|(0092)|(92)|(0))3\d{2}[- ]?\d{7}$"
                         title="Please enter a valid Pakistan number (e.g. 0345-1234567)"
                         class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 outline-none text-slate-800">
@@ -148,7 +151,7 @@ include 'includes/header.php';
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-slate-700 mb-2">Profile Picture</label>
                     <input type="file" name="avatar" accept="image/*"
-                           class="w-full px-4 py-2.5 rounded-lg border border-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer text-slate-600 focus:outline-none">
+                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand/10 file:text-brand hover:file:bg-brand/20 cursor-pointer text-slate-600 focus:outline-none">
                 </div>
             </div>
             <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">

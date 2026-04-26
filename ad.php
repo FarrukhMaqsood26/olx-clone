@@ -66,7 +66,25 @@ include 'includes/header.php';
                 
                 <div class="relative aspect-[4/3] sm:aspect-[16/9] w-full bg-slate-900 flex items-center justify-center overflow-hidden">
                     <?php if (count($images) > 0): ?>
-                        <img src="<?= htmlspecialchars($images[0]['image_path']) ?>" alt="<?= htmlspecialchars($ad['title']) ?>" id="mainAdImage" class="w-full h-full object-contain cursor-zoom-in transition-transform duration-500 hover:scale-105">
+                        <img src="<?= htmlspecialchars($images[0]['image_path']) ?>" alt="<?= htmlspecialchars($ad['title']) ?>" id="mainAdImage" 
+                            onclick="openLightbox(this.src, <?= htmlspecialchars(json_encode(array_column($images, 'image_path'))) ?>)"
+                            class="w-full h-full object-contain cursor-zoom-in transition-transform duration-500 hover:scale-105">
+                        
+                        <!-- Arrows -->
+                        <?php if(count($images) > 1): ?>
+                        <button onclick="prevImage(event)" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition md:opacity-0 group-hover:opacity-100">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="nextImage(event)" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition md:opacity-0 group-hover:opacity-100">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <?php endif; ?>
+
+                        <!-- Zoom Indicator -->
+                        <button onclick="openLightbox(document.getElementById('mainAdImage').src, <?= htmlspecialchars(json_encode(array_column($images, 'image_path'))) ?>)" 
+                            class="absolute bottom-4 right-4 bg-black/50 text-white p-2 rounded-lg hover:bg-black/70 transition flex items-center gap-2 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
+                            <i class="fas fa-expand"></i> Full Screen
+                        </button>
                     <?php else: ?>
                         <div class="text-center text-slate-500">
                             <i class="fas fa-image text-6xl mb-4 opacity-50"></i>
@@ -229,6 +247,29 @@ function changeMainImage(btn, src) {
     
     // Set active
     btn.querySelector('img').className = 'ad-thumb cursor-pointer w-20 h-16 sm:w-24 sm:h-20 object-cover rounded-lg border-2 border-brand opacity-100 shadow-sm transition';
+}
+
+const allAdImages = <?= json_encode(array_column($images, 'image_path')) ?>;
+let currentIdx = 0;
+
+function updateMain(idx) {
+    currentIdx = idx;
+    const thumbs = document.querySelectorAll('.ad-thumb');
+    if (thumbs[idx]) {
+        changeMainImage(thumbs[idx].parentElement, allAdImages[idx]);
+    }
+}
+
+function nextImage(e) {
+    if (e) e.stopPropagation();
+    let next = (currentIdx + 1) % allAdImages.length;
+    updateMain(next);
+}
+
+function prevImage(e) {
+    if (e) e.stopPropagation();
+    let prev = (currentIdx - 1 + allAdImages.length) % allAdImages.length;
+    updateMain(prev);
 }
 </script>
 
