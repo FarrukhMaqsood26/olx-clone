@@ -128,8 +128,10 @@ include 'includes/header.php';
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
-                    <input type="text" name="phone" value="<?= htmlspecialchars($user['phone'] ?? '') ?>"
+                    <input type="text" name="phone" id="profile-phone" value="<?= htmlspecialchars($user['phone'] ?? '') ?>"
                         placeholder="03xx-xxxxxxx"
+                        pattern="^((\+92)|(0092)|(92)|(0))3\d{2}[- ]?\d{7}$"
+                        title="Please enter a valid Pakistan number (e.g. 0345-1234567)"
                         class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 outline-none text-slate-800">
                 </div>
                 <div>

@@ -55,6 +55,50 @@ function get_auth_email_template($name, $otp) {
 }
 
 /**
+ * Returns a professionally designed HTML email template for Password Reset
+ */
+function get_reset_password_email_template($name, $resetLink) {
+    return '
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f9; color: #334155; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+            .header { background-color: #002f34; padding: 32px; text-align: center; }
+            .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.025em; text-transform: uppercase; }
+            .content { padding: 40px; text-align: center; }
+            .content h2 { font-size: 20px; font-weight: 700; color: #0f172a; margin-top: 0; }
+            .content p { font-size: 16px; line-height: 1.6; color: #64748b; margin-bottom: 32px; }
+            .reset-btn { background-color: #002f34; color: #ffffff; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; display: inline-block; transition: background-color 0.2s; }
+            .reset-btn:hover { background-color: #004d53; }
+            .footer { padding: 24px; text-align: center; font-size: 13px; color: #94a3b8; background-color: #f8fafc; }
+            .footer p { margin: 4px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>OLX CLONE</h1>
+            </div>
+            <div class="content">
+                <h2>Reset Your Password</h2>
+                <p>Hello '.htmlspecialchars($name).', we received a request to reset your OLX Clone account password. Click the button below to set a new password:</p>
+                <a href="'.$resetLink.'" class="reset-btn">Reset Password</a>
+                <p style="margin-top: 32px; font-size: 13px;">If you didn\'t request this, you can safely ignore this email. This link will expire in 1 hour.</p>
+            </div>
+            <div class="footer">
+                <p>&copy; 2026 OLX Clone. All rights reserved.</p>
+                <p>This is an automated security notification. Please do not reply.</p>
+            </div>
+        </div>
+    </body>
+    </html>';
+}
+
+/**
  * Utility to send email via SMTP (PHPMailer)
  */
 function send_auth_email($to, $subject, $htmlContent, $plainTextVersion = '') {
@@ -90,6 +134,18 @@ function send_auth_email($to, $subject, $htmlContent, $plainTextVersion = '') {
     }
 }
 
+/**
+ * Validates a Pakistan phone number
+ * Accepts formats: 03xxxxxxxxx, +923xxxxxxxxx, 923xxxxxxxxx
+ */
+function is_valid_pakistan_number($phone) {
+    // Remove any dashes or spaces
+    $phone = str_replace(['-', ' '], '', $phone);
+    // Regex for Pakistan mobile numbers
+    // Allows 03xx, 923xx, +923xx or 00923xx followed by 7-9 digits (standard is 7 after the 03xx)
+    return preg_match('/^((\+92)|(0092)|(92)|(0))3\d{9}$/', $phone);
+}
+
 // ---------------------------------------------------------
 // 1. SIGNUP (Phase 1: Details Submission)
 // ---------------------------------------------------------
@@ -100,6 +156,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signup'])) {
     $email = sanitize_input($_POST['email']);
     $phone = sanitize_input($_POST['phone']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+
+    // Validate Pakistan Phone Number
+    if (!is_valid_pakistan_number($phone)) {
+        header("Location: ../signup.php?error=invalid_phone");
+        exit;
+    }
 
     // Check uniqueness
     $check = $pdo->prepare("SELECT id FROM users WHERE username = ? OR email = ? OR phone = ?");
@@ -291,6 +353,12 @@ if ($action == 'update_profile' && $_SERVER["REQUEST_METHOD"] == "POST") {
     $phone = sanitize_input($_POST['phone']);
     $new_password = $_POST['new_password'];
 
+    // Validate Pakistan Phone Number
+    if (!is_valid_pakistan_number($phone)) {
+        header("Location: ../profile.php?error=invalid_phone");
+        exit;
+    }
+
     $update_query = "UPDATE users SET name = ?, phone = ?";
     $params = [$name, $phone];
 
@@ -327,7 +395,58 @@ if ($action == 'update_profile' && $_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // ---------------------------------------------------------
-// 6. LOGOUT
+// 6. FORGOT PASSWORD
+// ---------------------------------------------------------
+if (isset($_POST['action']) && $_POST['action'] == 'forgot_password') {
+    $email = sanitize_input($_POST['email']);
+    
+    $stmt = $pdo->prepare("SELECT id, name FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
+    
+    if ($user) {
+        $token = bin2hex(random_bytes(32));
+        $expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
+        
+        $upd = $pdo->prepare("UPDATE users SET reset_token = ?, reset_expiry = ? WHERE id = ?");
+        $upd->execute([$token, $expiry, $user['id']]);
+        
+        // Construct Link
+        $resetLink = "http://localhost/olx-clone/reset-password.php?token=" . $token;
+        $htmlMsg = get_reset_password_email_template($user['name'], $resetLink);
+        $plainMsg = "Hello " . $user['name'] . ", reset your password here: " . $resetLink;
+        
+        send_auth_email($email, "Reset Your Account Password", $htmlMsg, $plainMsg);
+    }
+    
+    // Always redirect to a "check your email" success page for security
+    header("Location: ../forgot-password.php?success=email_sent");
+    exit;
+}
+
+// ---------------------------------------------------------
+// 7. RESET PASSWORD (Final Submission)
+// ---------------------------------------------------------
+if (isset($_POST['action']) && $_POST['action'] == 'reset_password') {
+    $token = sanitize_input($_POST['token']);
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE reset_token = ? AND reset_expiry > NOW()");
+    $stmt->execute([$token]);
+    $user = $stmt->fetch();
+    
+    if ($user) {
+        $upd = $pdo->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_expiry = NULL WHERE id = ?");
+        $upd->execute([$password, $user['id']]);
+        header("Location: ../login.php?success=password_reset");
+    } else {
+        header("Location: ../forgot-password.php?error=invalid_token");
+    }
+    exit;
+}
+
+// ---------------------------------------------------------
+// 8. LOGOUT
 // ---------------------------------------------------------
 if ($action == 'logout') {
     session_unset();

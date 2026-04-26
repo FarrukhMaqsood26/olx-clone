@@ -83,6 +83,39 @@
             setTimeout(() => toast.remove(), 300);
         }, 1000);
     }
+
+    // Global Favorite Toggle
+    function toggleFavorite(adId, btn) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        $.ajax({
+            url: 'api/favorites.php',
+            type: 'POST',
+            data: { ad_id: adId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    const icon = $(btn).find('i');
+                    if (response.action === 'added') {
+                        icon.removeClass('far text-slate-400').addClass('fas text-red-500');
+                        showToast('Added to favorites!');
+                    } else {
+                        icon.removeClass('fas text-red-500').addClass('far text-slate-400');
+                        showToast('Removed from favorites!');
+                    }
+                } else if (response.message === 'login_required') {
+                    showToast('Please login to add favorites', 'error');
+                    setTimeout(() => window.location.href = 'login.php', 1500);
+                } else {
+                    showToast(response.message || 'Error updating favorites', 'error');
+                }
+            },
+            error: function() {
+                showToast('Something went wrong', 'error');
+            }
+        });
+    }
 </script>
 </body>
 

@@ -42,7 +42,9 @@ include 'includes/header.php';
             
             <div>
                 <label for="signup-phone" class="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
-                <input type="tel" name="phone" id="signup-phone" required placeholder="e.g. +92 3XX XXXXXXX" 
+                <input type="tel" name="phone" id="signup-phone" required placeholder="e.g. 03xx-xxxxxxx" 
+                    pattern="^((\+92)|(0092)|(92)|(0))3\d{2}[- ]?\d{7}$"
+                    title="Please enter a valid Pakistan number (e.g. 03451234567 or 0345-1234567)"
                     class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brand/20 focus:border-brand outline-none transition text-slate-800">
             </div>
             

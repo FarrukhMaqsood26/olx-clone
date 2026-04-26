@@ -4,12 +4,14 @@ require_once 'includes/config.php';
 // Fetch latest ads
 $stmt = $pdo->query("
     SELECT a.id, a.title, a.price, a.location, a.created_at, 
-           (SELECT image_path FROM ad_images WHERE ad_id = a.id AND is_primary = 1 LIMIT 1) as main_image
+           (SELECT image_path FROM ad_images WHERE ad_id = a.id AND is_primary = 1 LIMIT 1) as main_image,
+           (SELECT COUNT(*) FROM favorites WHERE user_id = ? AND ad_id = a.id) as is_favorited
     FROM ads a
     WHERE a.status = 'active'
     ORDER BY a.created_at DESC
     LIMIT 8
 ");
+$stmt->execute([isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0]);
 $ads = $stmt->fetchAll();
 
 include 'includes/header.php'; 
@@ -59,8 +61,9 @@ include 'includes/header.php';
             <?php if (count($ads) > 0): ?>
                 <?php foreach($ads as $ad): ?>
                     <a href="ad.php?id=<?= $ad['id'] ?>" class="group bg-white border border-slate-200 rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition duration-300 flex flex-col relative block">
-                        <button class="absolute top-3 right-3 bg-white/90 backdrop-blur text-slate-400 w-9 h-9 rounded-full flex items-center justify-center shadow-sm hover:text-red-500 z-10 transition">
-                            <i class="far fa-heart text-lg"></i>
+                        <?php $isFav = $ad['is_favorited'] > 0; ?>
+                        <button onclick="toggleFavorite(<?= $ad['id'] ?>, this)" class="absolute top-3 right-3 bg-white/90 backdrop-blur text-slate-400 w-9 h-9 rounded-full flex items-center justify-center shadow-sm z-10 transition hover:bg-white">
+                            <i class="<?= $isFav ? 'fas text-red-500' : 'far text-slate-400' ?> fa-heart text-lg"></i>
                         </button>
                         <?php 
                             $img = $ad['main_image'] ? $ad['main_image'] : 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80'; 

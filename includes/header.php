@@ -97,6 +97,10 @@ if (isset($_SESSION['user_id'])) {
                         <a href="admin/index.php" class="bg-accent hover:bg-accent-hover text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full transition">Admin Panel</a>
                     <?php endif; ?>
                     
+                    <a href="favorites.php" class="text-brand hover:text-brand-light relative p-2 transition" title="Favorites">
+                        <i class="far fa-heart text-xl"></i>
+                    </a>
+                    
                     <a href="chat.php" class="text-brand hover:text-brand-light relative p-2 transition" title="Messages">
                         <i class="far fa-envelope text-xl"></i>
                         <?php if($unread_count > 0): ?>
@@ -169,6 +173,7 @@ if (isset($_GET['error'])) {
         'invalid_token' => 'Invalid reset link.',
         'invalid_otp' => 'Incorrect OTP.',
         'already_exists' => 'Username, Email, or Phone already in use.',
+        'invalid_phone' => 'Please enter a valid Pakistan phone number (e.g. 03xx-xxxxxxx).',
     ];
     $err = isset($error_messages[$_GET['error']]) ? $error_messages[$_GET['error']] : 'An error occurred.';
     echo '<div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-medium"><i class="fas fa-exclamation-circle text-red-500"></i> ' . $err . '</div>';
@@ -179,9 +184,8 @@ if (isset($_GET['success'])) {
         'ad_updated' => 'Ad updated.',
         'ad_deleted' => 'Ad deleted.',
         'profile_updated' => 'Profile updated.',
-        'password_reset' => 'Password reset successfully.',
-        'reset_link_sent' => 'Email Sent! <a href="' . (isset($_GET['link']) ? htmlspecialchars($_GET['link']) : '#') . '" class="underline font-bold text-brand hover:text-brand-light ml-1">Click here to test resetting</a>',
-        'account_verified' => 'Account verified!'
+        'account_verified' => 'Account verified!',
+        'email_sent' => 'Reset link sent! Please check your email.'
     ];
     $msg = isset($success_messages[$_GET['success']]) ? $success_messages[$_GET['success']] : 'Success.';
     echo '<div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-medium"><i class="fas fa-check-circle text-green-500"></i> ' . $msg . '</div>';

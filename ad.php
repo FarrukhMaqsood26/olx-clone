@@ -9,13 +9,14 @@ if (!$id) {
 
 // Fetch ad details
 $stmt = $pdo->prepare("
-    SELECT a.*, u.name as seller_name, u.avatar, u.phone, u.created_at as member_since, c.name as category_name
+    SELECT a.*, u.name as seller_name, u.avatar, u.phone, u.created_at as member_since, c.name as category_name,
+           (SELECT COUNT(*) FROM favorites WHERE user_id = ? AND ad_id = a.id) as is_favorited
     FROM ads a
     JOIN users u ON a.user_id = u.id
     LEFT JOIN categories c ON a.category_id = c.id
     WHERE a.id = ?
 ");
-$stmt->execute([$id]);
+$stmt->execute([isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0, $id]);
 $ad = $stmt->fetch();
 
 if (!$ad) {
@@ -174,8 +175,10 @@ include 'includes/header.php';
                     </div>
                     <?php endif; ?>
                     
-                    <button class="flex items-center justify-center gap-2 w-full bg-white border border-slate-200 hover:border-red-500 hover:text-red-500 hover:bg-red-50 text-slate-600 font-bold py-3.5 px-4 rounded-xl transition shadow-sm group">
-                        <i class="far fa-heart group-hover:text-red-500 transition"></i> Add to Favorites
+                    <?php $isFav = (isset($ad['is_favorited']) && $ad['is_favorited'] > 0); ?>
+                    <button onclick="toggleFavorite(<?= $ad['id'] ?>, this)" class="flex items-center justify-center gap-2 w-full bg-white border border-slate-200 hover:border-red-500 hover:bg-red-50 text-slate-600 font-bold py-3.5 px-4 rounded-xl transition shadow-sm group">
+                        <i class="<?= $isFav ? 'fas text-red-500' : 'far text-slate-400 group-hover:text-red-500' ?> fa-heart transition"></i> 
+                        <span class="<?= $isFav ? 'text-red-500' : '' ?>"><?= $isFav ? 'Favorited' : 'Add to Favorites' ?></span>
                     </button>
                 </div>
             </div>
