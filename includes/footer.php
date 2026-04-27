@@ -68,25 +68,6 @@
     </div>
 </footer>
 
-<!-- Premium Lightbox Modal -->
-<div id="lightbox" class="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-all duration-300">
-    <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/70 hover:text-white transition text-3xl z-[110]">
-        <i class="fas fa-times"></i>
-    </button>
-    
-    <button id="lightboxPrev" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition z-[110] hidden">
-        <i class="fas fa-chevron-left"></i>
-    </button>
-    
-    <button id="lightboxNext" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition z-[110] hidden">
-        <i class="fas fa-chevron-right"></i>
-    </button>
-
-    <div class="max-w-7xl max-h-screen relative flex items-center justify-center">
-        <img id="lightboxImg" src="" alt="Zoomed view" class="max-w-full max-h-[90vh] object-contain shadow-2xl rounded-sm">
-    </div>
-</div>
-
 <script>
     // Toast notification handling
     function showToast(message, type = 'success') {
@@ -102,60 +83,6 @@
             setTimeout(() => toast.remove(), 300);
         }, 1000);
     }
-
-    // --- Lightbox Control ---
-    let currentLightboxImages = [];
-    let currentImageIndex = 0;
-
-    function openLightbox(src, allImages = []) {
-        const lightbox = document.getElementById('lightbox');
-        const img = document.getElementById('lightboxImg');
-        
-        currentLightboxImages = allImages.length > 0 ? allImages : [src];
-        currentImageIndex = currentLightboxImages.indexOf(src);
-        if (currentImageIndex === -1) currentImageIndex = 0;
-
-        img.src = src;
-        lightbox.classList.remove('hidden');
-        document.body.style.overflow = 'hidden'; // Prevent scroll
-
-        updateLightboxNav();
-    }
-
-    function closeLightbox() {
-        document.getElementById('lightbox').classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-
-    function updateLightboxNav() {
-        const prevBtn = document.getElementById('lightboxPrev');
-        const nextBtn = document.getElementById('lightboxNext');
-        
-        if (currentLightboxImages.length > 1) {
-            prevBtn.classList.remove('hidden');
-            nextBtn.classList.remove('hidden');
-        } else {
-            prevBtn.classList.add('hidden');
-            nextBtn.classList.add('hidden');
-        }
-    }
-
-    document.getElementById('lightboxNext')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        currentImageIndex = (currentImageIndex + 1) % currentLightboxImages.length;
-        document.getElementById('lightboxImg').src = currentLightboxImages[currentImageIndex];
-    });
-
-    document.getElementById('lightboxPrev')?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        currentImageIndex = (currentImageIndex - 1 + currentLightboxImages.length) % currentLightboxImages.length;
-        document.getElementById('lightboxImg').src = currentLightboxImages[currentImageIndex];
-    });
-
-    // Close on click outside image
-    document.getElementById('lightbox')?.addEventListener('click', function(e) {
-        if (e.target === this) closeLightbox();
-    });
 
     // Global Favorite Toggle
     function toggleFavorite(adId, btn) {
