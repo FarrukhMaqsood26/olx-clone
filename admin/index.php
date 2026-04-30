@@ -8,6 +8,7 @@ $totalAds = $pdo->query("SELECT COUNT(*) FROM ads")->fetchColumn();
 $activeAds = $pdo->query("SELECT COUNT(*) FROM ads WHERE status = 'active'")->fetchColumn();
 $totalCategories = $pdo->query("SELECT COUNT(*) FROM categories")->fetchColumn();
 
+
 // Fetch recent users
 $recentUsers = $pdo->query("SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC LIMIT 5")->fetchAll();
 
@@ -61,6 +62,8 @@ $recentAds = $pdo->query("SELECT a.id, a.title, a.status, a.price, u.name as use
             <i class="fas fa-tags"></i>
         </div>
     </div>
+
+
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">

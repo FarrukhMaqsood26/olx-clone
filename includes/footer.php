@@ -1,5 +1,7 @@
+</main>
+
 <footer class="bg-white border-t border-slate-200 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+    <div class="app-container py-10 md:py-16">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div>
                 <h4 class="text-slate-900 font-bold text-sm uppercase tracking-wide mb-4">Popular Categories</h4>
@@ -88,13 +90,13 @@
     function toggleFavorite(adId, btn) {
         event.preventDefault();
         event.stopPropagation();
-        
+
         $.ajax({
             url: 'api/favorites.php',
             type: 'POST',
             data: { ad_id: adId },
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
                 if (response.success) {
                     const icon = $(btn).find('i');
                     if (response.action === 'added') {
@@ -111,7 +113,7 @@
                     showToast(response.message || 'Error updating favorites', 'error');
                 }
             },
-            error: function() {
+            error: function () {
                 showToast('Something went wrong', 'error');
             }
         });

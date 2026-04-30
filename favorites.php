@@ -24,7 +24,7 @@ $favAds = $stmt->fetchAll();
 include 'includes/header.php';
 ?>
 
-<main class="flex-grow py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+
     <div class="mb-8">
         <h1 class="text-3xl font-extrabold text-slate-900 mb-2">My Favorites</h1>
         <p class="text-slate-500 font-medium italic">Your saved items for quick access.</p>
@@ -39,7 +39,7 @@ include 'includes/header.php';
                     </button>
                     
                     <a href="ad.php?id=<?= $ad['id'] ?>" class="block flex-1">
-                        <?php $img = $ad['main_image'] ? $ad['main_image'] : 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=600&q=80'; ?>
+                        <?php $img = get_ad_image($ad['main_image']); ?>
                         <div class="aspect-[4/3] overflow-hidden border-b border-slate-100">
                             <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($ad['title']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
                         </div>
@@ -64,6 +64,6 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
     </div>
-</main>
+
 
 <?php include 'includes/footer.php'; ?>

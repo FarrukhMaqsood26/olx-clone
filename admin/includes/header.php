@@ -12,6 +12,8 @@ require_once __DIR__.'/check_admin.php';
     <title>OLX Admin Panel</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Tailwind CSS (Play CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -79,6 +81,7 @@ require_once __DIR__.'/check_admin.php';
             <a href="users.php" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold transition <?= $current_page == 'users.php' ? 'bg-accent text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white' ?>">
                 <i class="fas fa-users w-5 text-center"></i> Users
             </a>
+
             
             <div class="pt-6 mt-6 border-t border-white/5 space-y-1">
                 <a href="../index.php" target="_blank" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition">

@@ -1,6 +1,6 @@
 <?php include 'includes/header.php'; ?>
 
-<main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-center py-12">
     <div class="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
         <div class="text-center mb-8">
             <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Reset Password</h2>
@@ -27,6 +27,6 @@
             </a>
         </div>
     </div>
-</main>
+</div>
 
 <?php include 'includes/footer.php'; ?>

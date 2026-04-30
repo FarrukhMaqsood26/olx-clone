@@ -10,10 +10,11 @@ if (isset($_SESSION['user_id'])) {
     exit;
 }
 include 'includes/header.php'; 
+include 'includes/preloader.php';
 ?>
 
-<main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+<div class="flex items-center justify-center py-20 px-4">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-lg border border-slate-200 p-8 sm:p-10">
         <div class="text-center mb-8">
             <h2 class="text-3xl font-extrabold text-slate-900 mb-2">Welcome Back</h2>
             <p class="text-slate-500">Log in to manage your ads and messages.</p>
@@ -62,6 +63,6 @@ include 'includes/header.php';
             Don't have an account? <a href="signup.php" class="font-bold text-brand hover:underline">Sign up</a>
         </p>
     </div>
-</main>
+</div>
 
 <?php include 'includes/footer.php'; ?>

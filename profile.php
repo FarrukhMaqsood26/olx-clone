@@ -39,11 +39,11 @@ $totalChats = $msgStmt->fetchColumn();
 include 'includes/header.php';
 ?>
 
-<main class="flex-grow py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full bg-red">
+
 
     <!-- Profile Header -->
     <div
-        class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8 mb-8 flex flex-col md:flex-row items-center md:items-start gap-6 relative">
+        class="bg-white border border-slate-200 rounded-[2rem] shadow-lg p-8 md:p-12 mb-8 flex flex-col md:flex-row items-center md:items-start gap-8 relative overflow-hidden">
         <div class="w-24 h-24 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden shadow-sm border border-slate-100 bg-brand/10 text-brand relative group">
             <?php if (!empty($user['avatar']) && $user['avatar'] !== 'default.png' && file_exists('uploads/avatars/' . $user['avatar'])): ?>
                 <img src="uploads/avatars/<?= htmlspecialchars($user['avatar']) ?>" alt="Profile Picture" class="w-full h-full object-cover">
@@ -94,7 +94,7 @@ include 'includes/header.php';
                     </div>
                     <div class="text-xs font-semibold text-blue-600 uppercase tracking-widest mt-1">Chats</div>
                 </div>
-                <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-center">
+                <div class="bg-amber-50 border border-amber-100 rounded-xl p-5 text-center">
                     <div class="text-2xl font-extrabold text-amber-600">
                         <?= $pendingAds ?>
                     </div>
@@ -187,12 +187,12 @@ include 'includes/header.php';
     <div id="adsContainer" class="space-y-4">
         <?php if (count($myAds) > 0): ?>
             <?php foreach ($myAds as $ad): ?>
-                <div class="my-ad-card relative bg-white border border-slate-200 rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row gap-6 transition hover:shadow-md"
+                <div class="my-ad-card relative bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row gap-8 transition hover:shadow-md"
                     data-status="<?= $ad['status'] ?>">
 
                     <a href="ad.php?id=<?= $ad['id'] ?>"
                         class="w-full sm:w-48 h-48 sm:h-32 flex-shrink-0 rounded-lg overflow-hidden border border-slate-100">
-                        <?php $img = $ad['main_image'] ?: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=300&q=80'; ?>
+                        <?php $img = get_ad_image($ad['main_image']); ?>
                         <img src="<?= htmlspecialchars($img) ?>" alt="Ad image" class="w-full h-full object-cover">
                     </a>
 
@@ -239,7 +239,7 @@ include 'includes/header.php';
                                 <?php endif; ?>
                             </div>
 
-                            <div class="flex gap-2 w-full sm:w-auto">
+                            <div class="flex flex-wrap gap-2 w-full sm:w-auto">
                                 <?php if ($ad['status'] === 'active'): ?>
                                     <button
                                         class="flex-1 sm:flex-none bg-white border border-emerald-500 hover:bg-emerald-50 text-emerald-700 font-bold py-2 px-4 rounded-lg text-sm transition flex items-center justify-center gap-2"
@@ -247,11 +247,20 @@ include 'includes/header.php';
                                         <i class="fas fa-check-circle"></i> Mark Sold
                                     </button>
                                 <?php endif; ?>
+
+                                <?php if ($ad['status'] !== 'sold'): ?>
+                                    <a href="edit-ad.php?id=<?= $ad['id'] ?>"
+                                        class="flex-1 sm:flex-none bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-2 px-4 rounded-lg text-sm transition flex items-center justify-center gap-2">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                <?php endif; ?>
+
                                 <button
                                     class="flex-1 sm:flex-none bg-white border border-red-300 hover:bg-red-50 text-red-600 font-bold py-2 px-4 rounded-lg text-sm transition flex items-center justify-center gap-2"
                                     onclick="confirmAction('Delete this ad permanently?', () => window.location='api/ads.php?action=delete&id=<?= $ad['id'] ?>')">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -270,7 +279,7 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
     </div>
-</main>
+
 
 <script>
     function toggleEditForm() {

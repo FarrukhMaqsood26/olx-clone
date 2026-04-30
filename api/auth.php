@@ -115,6 +115,15 @@ function send_auth_email($to, $subject, $htmlContent, $plainTextVersion = '') {
         $mail->Password   = SMTP_PASS;
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = SMTP_PORT;
+        
+        // Skip SSL verification for local development (common XAMPP issue)
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
 
         $mail->setFrom(SMTP_USER, 'OLX Clone Verification');
         $mail->addAddress($to);
@@ -147,7 +156,7 @@ function is_valid_pakistan_number($phone) {
 }
 
 // ---------------------------------------------------------
-// 1. SIGNUP (Phase 1: Details Submission)
+// 1. SIGNUP
 // ---------------------------------------------------------
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signup'])) {
@@ -187,19 +196,71 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signup'])) {
         }
     }
 
-    $stmt = $pdo->prepare("INSERT INTO users (name, username, email, phone, password, is_email_verified, verification_code, avatar) VALUES (?, ?, ?, ?, ?, 0, ?, ?)");
-    if ($stmt->execute([$name, $username, $email, $phone, $password, $otp, $avatar_name])) {
-        // Send Polished HTML OTP Email
-        $htmlMsg = get_auth_email_template($name, $otp);
-        $plainMsg = "Hello $name, your OLX Clone verification code is: $otp";
-        send_auth_email($email, "Verify Your Account - $otp", $htmlMsg, $plainMsg);
+    try {
+        $pdo->beginTransaction();
         
-        header("Location: ../verify-otp.php?email=" . urlencode($email));
-        exit;
-    } else {
+        // DEBUG: Log received POST keys
+        file_put_contents('auth_debug.txt', "Received POST keys: " . implode(', ', array_keys($_POST)) . "\n", FILE_APPEND);
+        if (isset($_POST['scan_front_image'])) {
+            file_put_contents('auth_debug.txt', "Front Image Length: " . strlen($_POST['scan_front_image']) . "\n", FILE_APPEND);
+        }
+
+        $stmt = $pdo->prepare("
+            INSERT INTO users (
+                name, username, email, phone, password,
+                is_email_verified, verification_code, avatar
+            ) VALUES (?, ?, ?, ?, ?, 0, ?, ?)
+        ");
+        $stmt->execute([
+            $name, $username, $email, $phone, $password, $otp, $avatar_name
+        ]);
+        
+        $userId = (int)$pdo->lastInsertId();
+
+        // Save Face Scans
+        $scan_angles = ['front', 'left', 'right', 'up', 'down'];
+        $landmarks_json = isset($_POST['scan_landmarks']) ? $_POST['scan_landmarks'] : null;
+        $landmarks_array = $landmarks_json ? json_decode($landmarks_json, true) : [];
+
+        foreach ($scan_angles as $angle) {
+            $post_key = "scan_{$angle}_image";
+            if (isset($_POST[$post_key]) && !empty($_POST[$post_key])) {
+                $base64Data = $_POST[$post_key];
+                if (preg_match('/^data:image\/(\w+);base64,/', $base64Data, $type)) {
+                    $data = substr($base64Data, strpos($base64Data, ',') + 1);
+                    $data = base64_decode($data);
+                    
+                    $scan_filename = 'scan_' . $userId . '_' . $angle . '_' . time() . '.jpg';
+                    $scan_dir = '../uploads/face-scans/';
+                    if (!is_dir($scan_dir)) mkdir($scan_dir, 0777, true);
+                    
+                    if (file_put_contents($scan_dir . $scan_filename, $data)) {
+                        $angleLandmarks = isset($landmarks_array[$angle]) ? json_encode($landmarks_array[$angle]) : null;
+                        
+                        $pdo->prepare("
+                            INSERT INTO user_face_scans (user_id, capture_type, image_path, mesh_landmarks_json, capture_angle)
+                            VALUES (?, 'face_mesh', ?, ?, ?)
+                        ")->execute([$userId, $scan_filename, $angleLandmarks, $angle]);
+                    }
+                }
+            }
+        }
+        
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        error_log('Signup failed: ' . $e->getMessage());
         header("Location: ../signup.php?error=registration_failed");
         exit;
     }
+
+    // Send Polished HTML OTP Email
+    $htmlMsg = get_auth_email_template($name, $otp);
+    $plainMsg = "Hello $name, your OLX Clone verification code is: $otp";
+    send_auth_email($email, "Verify Your Account - $otp", $htmlMsg, $plainMsg);
+
+    header("Location: ../verify-otp.php?email=" . urlencode($email));
+    exit;
 }
 
 // ---------------------------------------------------------
@@ -221,7 +282,7 @@ if ($action == 'verify_otp' && $_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = strtolower($user['role']);
-        
+
         $redirect = ($_SESSION['user_role'] === 'admin') ? "../admin/index.php" : "../index.php";
         header("Location: $redirect?success=account_verified");
         exit;
@@ -321,15 +382,19 @@ if ($action == 'google_callback') {
             $user = $stmt->fetch();
 
             if (!$user) {
-                $pass = password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("INSERT INTO users (name, username, email, password, is_email_verified) VALUES (?, ?, ?, ?, 1)");
-                $stmt->execute([$name, $username, $email, $pass]);
-                $user = ['id' => $pdo->lastInsertId(), 'name' => $name, 'role' => 'user'];
+                // Auto-create account for Google users
+                $stmt = $pdo->prepare("INSERT INTO users (name, username, email, password, is_email_verified, avatar) VALUES (?, ?, ?, ?, 1, 'default.png')");
+                $stmt->execute([$name, $username, $email, password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT)]);
+                $userId = (int)$pdo->lastInsertId();
+                
+                $_SESSION['user_id'] = $userId;
+                $_SESSION['user_name'] = $name;
+                $_SESSION['user_role'] = 'user';
+            } else {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_name'] = $user['name'];
+                $_SESSION['user_role'] = strtolower($user['role']);
             }
-
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['name'];
-            $_SESSION['user_role'] = strtolower($user['role']);
             
             $redirect = ($_SESSION['user_role'] === 'admin') ? "../admin/index.php" : "../index.php";
             header("Location: $redirect");

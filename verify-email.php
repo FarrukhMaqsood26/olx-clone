@@ -12,7 +12,7 @@ $simulated_token = isset($_GET['simulated_token']) ? htmlspecialchars($_GET['sim
 include 'includes/header.php';
 ?>
 
-<main class="flex-grow flex items-center justify-center p-4">
+<div class="flex-grow flex items-center justify-center p-4">
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm max-w-md w-full p-8 text-center relative overflow-hidden">
         <!-- Decorative bg -->
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-brand/5 rounded-full blur-3xl"></div>
@@ -44,6 +44,6 @@ include 'includes/header.php';
             </div>
         </div>
     </div>
-</main>
+</div>
 
 <?php include 'includes/footer.php'; ?>

@@ -8,36 +8,34 @@ $sort = isset($_GET['sort']) ? sanitize_input($_GET['sort']) : 'time_desc';
 
 // Build the search query dynamically
 $sql = "
-    SELECT a.id, a.title, a.price, a.location, a.created_at, a.condition_type, c.name as category_name,
-           (SELECT image_path FROM ad_images WHERE ad_id = a.id AND is_primary = 1 LIMIT 1) as main_image
-    FROM ads a
-    JOIN categories c ON a.category_id = c.id
-    WHERE a.status = 'active'
+    SELECT v.*, v.primary_image as main_image
+    FROM view_active_ads v
+    WHERE 1=1
 ";
 $params = [];
 
 if (!empty($query)) {
-    $sql .= " AND (a.title LIKE ? OR a.description LIKE ?)";
+    $sql .= " AND (v.title LIKE ? OR v.description LIKE ?)";
     $params[] = "%$query%";
     $params[] = "%$query%";
 }
 
 if (!empty($category) && $category !== 'all') {
-    $sql .= " AND c.slug = ?";
+    $sql .= " AND v.category_slug = ?";
     $params[] = $category;
 }
 
 if (!empty($location)) {
-    $sql .= " AND a.location LIKE ?";
+    $sql .= " AND v.location LIKE ?";
     $params[] = "%$location%";
 }
 
 if ($sort === 'price_asc') {
-    $sql .= " ORDER BY a.price ASC LIMIT 50";
+    $sql .= " ORDER BY v.price ASC LIMIT 50";
 } elseif ($sort === 'price_desc') {
-    $sql .= " ORDER BY a.price DESC LIMIT 50";
+    $sql .= " ORDER BY v.price DESC LIMIT 50";
 } else {
-    $sql .= " ORDER BY a.created_at DESC LIMIT 50";
+    $sql .= " ORDER BY v.created_at DESC LIMIT 50";
 }
 
 $stmt = $pdo->prepare($sql);
@@ -51,7 +49,7 @@ $categories = $catStmt->fetchAll();
 include 'includes/header.php'; 
 ?>
 
-<main class="flex-grow py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 md:p-8 mb-8">
         <h2 class="text-2xl font-bold text-slate-900 mb-1">
             <?php if($query): ?>
@@ -121,7 +119,7 @@ include 'includes/header.php';
                         <?= htmlspecialchars($ad['category_name']) ?>
                     </span>
                     
-                    <?php $img = $ad['main_image'] ? $ad['main_image'] : 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=500&q=60'; ?>
+                    <?php $img = get_ad_image($ad['main_image']); ?>
                     <div class="aspect-[4/3] overflow-hidden border-b border-slate-100">
                         <img src="<?= htmlspecialchars($img) ?>" alt="<?= htmlspecialchars($ad['title']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" loading="lazy">
                     </div>
@@ -146,6 +144,6 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
     </div>
-</main>
+
 
 <?php include 'includes/footer.php'; ?>

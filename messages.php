@@ -44,7 +44,7 @@ include 'includes/header.php';
 .msg-body { font-size: 16px; color: var(--text-primary); }
 </style>
 
-<main>
+
     <div class="messages-container">
         <h2 style="color: var(--primary-teal);">Your Messages</h2>
         
@@ -78,6 +78,6 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
     </div>
-</main>
+
 
 <?php include 'includes/footer.php'; ?>
