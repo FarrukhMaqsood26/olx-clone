@@ -32,8 +32,8 @@ if (isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="OLX Clone - Buy and sell anything near you. Find the best deals on mobiles, vehicles, property, and more.">
-    <title>OLX Clone - Buy and Sell Anything</title>
+    <meta name="description" content="Bazaar - Buy and sell anything near you. Find the best deals on mobiles, vehicles, property, and more.">
+    <title>Bazaar - Buy and Sell Anything</title>
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>">
     <!-- Font Awesome -->
@@ -233,7 +233,7 @@ if (isset($_SESSION['user_id'])) {
                     <i class="fas fa-bars text-xl"></i>
                 </button>
                 <a href="index.php" class="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                    <span class="text-xl sm:text-3xl font-extrabold text-brand tracking-tight">OLX</span>
+                    <span class="text-xl sm:text-3xl font-extrabold text-brand tracking-tight">BAZAAR</span>
                     <span class="hidden sm:block text-[10px] sm:text-xs font-bold text-white bg-accent px-1.5 sm:px-2 py-0.5 rounded-md tracking-wider">PK</span>
                 </a>
             </div>

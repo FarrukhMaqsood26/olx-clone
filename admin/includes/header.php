@@ -9,7 +9,7 @@ require_once __DIR__.'/check_admin.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OLX Admin Panel</title>
+    <title>Bazaar Admin Panel</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- jQuery -->
@@ -51,7 +51,7 @@ require_once __DIR__.'/check_admin.php';
     <!-- Sidebar -->
     <aside id="adminSidebar" class="bg-brand w-64 fixed inset-y-0 left-0 z-50 transform -translate-x-full md:translate-x-0 md:relative flex flex-col transition-transform duration-300 shadow-xl">
         <div class="h-16 flex items-center justify-between px-6 bg-slate-900 border-b border-white/10">
-            <a href="index.php" class="text-white font-extrabold tracking-widest text-xl">OLX<span class="text-accent font-light">ADMIN</span></a>
+            <a href="index.php" class="text-white font-extrabold tracking-widest text-xl">BAZAAR<span class="text-accent font-light">ADMIN</span></a>
             <button class="text-slate-400 hover:text-white md:hidden" onclick="toggleAdminSidebar()">
                 <i class="fas fa-times"></i>
             </button>

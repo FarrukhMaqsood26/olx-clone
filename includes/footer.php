@@ -34,16 +34,16 @@
             <div>
                 <h4 class="text-slate-900 font-bold text-sm uppercase tracking-wide mb-4">About Us</h4>
                 <ul class="space-y-3">
-                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">About OLX Group</a></li>
-                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">OLX Blog</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">About Bazaar Group</a></li>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">Bazaar Blog</a></li>
                     <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">Contact Us</a></li>
-                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">OLX for Businesses</a>
+                    <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">Bazaar for Businesses</a>
                     </li>
                 </ul>
             </div>
 
             <div>
-                <h4 class="text-slate-900 font-bold text-sm uppercase tracking-wide mb-4">OLX Clone</h4>
+                <h4 class="text-slate-900 font-bold text-sm uppercase tracking-wide mb-4">Bazaar</h4>
                 <ul class="space-y-3">
                     <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">Help</a></li>
                     <li><a href="#" class="text-sm text-slate-500 hover:text-accent transition">Sitemap</a></li>
@@ -65,7 +65,7 @@
                             class="fab fa-instagram text-lg"></i></a>
                 </div>
             </div>
-            <p class="text-xs text-slate-500">Free Classifieds in Pakistan . &copy; 2006-2026 OLX Clone</p>
+            <p class="text-xs text-slate-500">Free Classifieds in Pakistan . &copy; 2006-2026 Bazaar</p>
         </div>
     </div>
 </footer>

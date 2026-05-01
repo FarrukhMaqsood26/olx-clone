@@ -14,7 +14,7 @@ session_start();
 
 // Database connection settings
 $host = '127.0.0.1';
-$dbname = 'olx_clone';
+$dbname = 'bazaar';
 $username = 'root'; // Standard XAMPP/WAMP username
 $password = '';     // Standard XAMPP/WAMP password
 
@@ -31,7 +31,7 @@ try {
 // Google OAuth Application Credentials
 define('GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID');
 define('GOOGLE_CLIENT_SECRET', 'YOUR_GOOGLE_CLIENT_SECRET');
-define('GOOGLE_REDIRECT_URL', 'http://localhost/olx/api/auth.php?action=google_callback');
+define('GOOGLE_REDIRECT_URL', 'http://localhost/bazaar/api/auth.php?action=google_callback');
 
 function sanitize_input($data) {
     $data = trim($data);

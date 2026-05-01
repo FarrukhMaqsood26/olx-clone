@@ -1,7 +1,7 @@
-# OLX Clone - Technical Documentation & Viva Guide
+# Bazaar - Technical Documentation & Viva Guide
 
 ## 1. Project Overview
-This project is a comprehensive **OLX Clone** built as a full-stack web application. It features a modern user interface, real-time communication, and a robust administrative backend. The primary goal is to provide a platform for users to buy and sell items within categories.
+This project is a comprehensive **Bazaar** built as a full-stack web application. It features a modern user interface, real-time communication, and a robust administrative backend. The primary goal is to provide a platform for users to buy and sell items within categories.
 
 ## 2. Technology Stack
 - **Frontend:** HTML5, CSS3 (Custom Design System), JavaScript (ES6+), AJAX.
@@ -80,9 +80,9 @@ The database consists of several interconnected tables:
 
 ## 7. How to Run (Viva Demo)
 1. Open **XAMPP Control Panel** and start Apache & MySQL.
-2. Import `database/schema.sql` into a database named `olx_clone`.
+2. Import `database/schema.sql` into a database named `bazaar`.
 3. Configure `includes/config.php` with your database credentials.
-4. Access the project via `http://localhost/olx-clone/`.
+4. Access the project via `http://localhost/bazaar/`.
 5. Login with a test user or sign up to experience the OTP flow.
 
 ---

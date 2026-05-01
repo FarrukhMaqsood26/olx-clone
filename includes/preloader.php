@@ -3,7 +3,7 @@
     <div class="relative flex flex-col items-center">
         <!-- Logo Text -->
         <div class="mb-8 opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]">
-            <span class="text-4xl font-extrabold text-brand tracking-tighter">OLX</span>
+            <span class="text-4xl font-extrabold text-brand tracking-tighter">BAZAAR</span>
             <span class="text-xs font-bold text-white bg-accent px-2 py-1 rounded-md ml-1">PK</span>
         </div>
         

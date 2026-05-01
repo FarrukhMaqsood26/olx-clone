@@ -1,6 +1,6 @@
-USE olx_clone;
+USE bazaar;
 
-INSERT IGNORE INTO users (id, name, email, password) VALUES (999, 'Test Seller', 'seller@olx.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
+INSERT IGNORE INTO users (id, name, email, password) VALUES (999, 'Test Seller', 'seller@bazaar.test', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi');
 
 INSERT INTO ads (id, user_id, category_id, title, description, price, condition_type, location, status, created_at) VALUES 
 (101, 999, 1, 'iPhone 14 Pro Max 256GB - Deep Purple', 'Brand new condition, PTA approved, 100% battery health. Comes with original box and cable.', 320000.00, 'used', 'DHA Phase 5, Lahore', 'active', NOW()),

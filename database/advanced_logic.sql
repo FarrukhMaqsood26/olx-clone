@@ -1,4 +1,4 @@
--- Advanced Database Logic for OLX Clone
+-- Advanced Database Logic for Bazaar
 -- Includes: Views, Stored Procedures, Triggers, and Audit Logging
 
 -- 1. Create Audit Logs Table (For Triggers)

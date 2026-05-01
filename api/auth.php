@@ -35,7 +35,7 @@ function get_auth_email_template($name, $otp) {
     <body>
         <div class="container">
             <div class="header">
-                <h1>OLX CLONE</h1>
+                <h1>Bazaar</h1>
             </div>
             <div class="content">
                 <h2>Hello, '.htmlspecialchars($name).'!</h2>
@@ -46,7 +46,7 @@ function get_auth_email_template($name, $otp) {
                 <p>Wait! If you didn\'t request this, simply ignore this email. This code is valid for a limited time only.</p>
             </div>
             <div class="footer">
-                <p>&copy; 2026 OLX Clone. All rights reserved.</p>
+                <p>&copy; 2026 Bazaar. All rights reserved.</p>
                 <p>This is an automated security notification. Please do not reply.</p>
             </div>
         </div>
@@ -81,16 +81,16 @@ function get_reset_password_email_template($name, $resetLink) {
     <body>
         <div class="container">
             <div class="header">
-                <h1>OLX CLONE</h1>
+                <h1>Bazaar</h1>
             </div>
             <div class="content">
                 <h2>Reset Your Password</h2>
-                <p>Hello '.htmlspecialchars($name).', we received a request to reset your OLX Clone account password. Click the button below to set a new password:</p>
+                <p>Hello '.htmlspecialchars($name).', we received a request to reset your Bazaar account password. Click the button below to set a new password:</p>
                 <a href="'.$resetLink.'" class="reset-btn">Reset Password</a>
                 <p style="margin-top: 32px; font-size: 13px;">If you didn\'t request this, you can safely ignore this email. This link will expire in 1 hour.</p>
             </div>
             <div class="footer">
-                <p>&copy; 2026 OLX Clone. All rights reserved.</p>
+                <p>&copy; 2026 Bazaar. All rights reserved.</p>
                 <p>This is an automated security notification. Please do not reply.</p>
             </div>
         </div>
@@ -125,7 +125,7 @@ function send_auth_email($to, $subject, $htmlContent, $plainTextVersion = '') {
             )
         );
 
-        $mail->setFrom(SMTP_USER, 'OLX Clone Verification');
+        $mail->setFrom(SMTP_USER, 'Bazaar Verification');
         $mail->addAddress($to);
 
         $mail->isHTML(true);
@@ -256,7 +256,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signup'])) {
 
     // Send Polished HTML OTP Email
     $htmlMsg = get_auth_email_template($name, $otp);
-    $plainMsg = "Hello $name, your OLX Clone verification code is: $otp";
+    $plainMsg = "Hello $name, your Bazaar verification code is: $otp";
     send_auth_email($email, "Verify Your Account - $otp", $htmlMsg, $plainMsg);
 
     header("Location: ../verify-otp.php?email=" . urlencode($email));
@@ -311,7 +311,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
             
             // Send Polished HTML OTP Email
             $htmlMsg = get_auth_email_template($user['name'], $otp);
-            $plainMsg = "Hello " . $user['name'] . ", your OLX Clone verification code is: $otp";
+            $plainMsg = "Hello " . $user['name'] . ", your Bazaar verification code is: $otp";
             send_auth_email($user['email'], "Verify Your Account - $otp", $htmlMsg, $plainMsg);
             
             header("Location: ../verify-otp.php?email=" . urlencode($user['email']));
@@ -477,7 +477,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'forgot_password') {
         $upd->execute([$token, $expiry, $user['id']]);
         
         // Construct Link
-        $resetLink = "http://localhost/olx-clone/reset-password.php?token=" . $token;
+        $resetLink = "http://localhost/bazaar/reset-password.php?token=" . $token;
         $htmlMsg = get_reset_password_email_template($user['name'], $resetLink);
         $plainMsg = "Hello " . $user['name'] . ", reset your password here: " . $resetLink;
         

@@ -1,5 +1,5 @@
 // ===================================================
-// OLX Clone - Main Application JavaScript
+// Bazaar - Main Application JavaScript
 // ===================================================
 
 $(document).ready(function() {
