@@ -41,8 +41,14 @@ if ($action == 'create' && $_SERVER["REQUEST_METHOD"] == "POST") {
         $upload_dir = __DIR__ . '/../uploads/ads/';
         if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
 
-    // Handle file uploads - check both possible keys
-    $fileKey = isset($_FILES['images']) ? 'images' : (isset($_FILES['images[]']) ? 'images[]' : null);
+        // Handle file uploads - check both possible keys
+        $fileKey = isset($_FILES['images']) ? 'images' : (isset($_FILES['images[]']) ? 'images[]' : null);
+        
+        if (!$fileKey || (is_array($_FILES[$fileKey]['name']) && empty($_FILES[$fileKey]['name'][0]))) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            echo json_encode(['success' => false, 'message' => 'At least one image is required to post an ad.']);
+            exit;
+        }
     
     if ($fileKey) {
         $files = $_FILES[$fileKey];

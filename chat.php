@@ -52,8 +52,11 @@ include 'includes/header.php';
                     </div>
                     <div>
                         <div class="font-bold text-slate-900" id="activePartnerName">...</div>
-                        <div class="text-xs font-semibold text-emerald-500 flex items-center gap-1" id="onlineLabel">
+                        <div class="hidden text-xs font-semibold text-emerald-500 flex items-center gap-1" id="onlineLabel">
                             <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span> Online
+                        </div>
+                        <div class="text-xs font-semibold text-slate-400 flex items-center gap-1" id="offlineLabel">
+                            <span class="w-2 h-2 rounded-full bg-slate-300 inline-block"></span> Offline
                         </div>
                         <div class="hidden text-xs text-slate-500 mt-0.5 items-center gap-2" id="typingIndicator">
                            
@@ -63,42 +66,88 @@ include 'includes/header.php';
                 </div>
 
                 <!-- Chat Thread -->
-                <div class="flex-1 p-3 sm:p-6 overflow-y-auto flex flex-col gap-3 sm:gap-4 relative" id="chatThread" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');">
+                <div class="flex-1 p-3 sm:p-6 pb-48 sm:pb-56 overflow-y-auto flex flex-col gap-3 sm:gap-4 relative" id="chatThread" style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png');">
                     <!-- Messages bubbles go here -->
                 </div>
 
                 <!-- Input Area -->
-                <div class="bg-white p-2.5 sm:p-4 border-t border-slate-200">
-                    <div class="flex items-center gap-1 sm:gap-2 relative max-w-4xl mx-auto">
-                        
-                        <!-- Recording Status Banner -->
-                        <div class="absolute inset-0 bg-white z-10 hidden items-center justify-between px-3 sm:px-4 rounded-full border border-red-200 shadow-sm" id="recordingBar">
-                            <div class="flex items-center gap-2 sm:gap-3 text-red-500 font-bold text-xs sm:text-sm truncate">
-                                <span class="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-red-500 animate-pulse shrink-0"></span>
-                                <span class="truncate">Recording...</span>
-                            </div>
-                            <button onclick="stopRecording()" class="text-brand font-bold uppercase text-xs sm:text-sm tracking-wider hover:underline shrink-0 pl-2">Done</button>
+                <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-8 bg-transparent z-30 pointer-events-none">
+                    <div class="max-w-4xl mx-auto pointer-events-none">
+                        <!-- Quick Suggestions (Now Floating) -->
+                        <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 px-2 py-1 pointer-events-auto">
+                            <button type="button" class="suggestion-chip shrink-0 text-[10px] sm:text-xs font-bold text-slate-700 bg-white/60 backdrop-blur-md border border-white/20 hover:border-brand hover:text-brand px-5 py-2.5 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 whitespace-nowrap">Is this available?</button>
+                            <button type="button" class="suggestion-chip shrink-0 text-[10px] sm:text-xs font-bold text-slate-700 bg-white/60 backdrop-blur-md border border-white/20 hover:border-brand hover:text-brand px-5 py-2.5 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 whitespace-nowrap">Final price?</button>
+                            <button type="button" class="suggestion-chip shrink-0 text-[10px] sm:text-xs font-bold text-slate-700 bg-white/60 backdrop-blur-md border border-white/20 hover:border-brand hover:text-brand px-5 py-2.5 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 whitespace-nowrap">Where to meet?</button>
+                            <button type="button" class="suggestion-chip shrink-0 text-[10px] sm:text-xs font-bold text-slate-700 bg-white/60 backdrop-blur-md border border-white/20 hover:border-brand hover:text-brand px-5 py-2.5 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 whitespace-nowrap">Condition?</button>
+                            <button type="button" class="suggestion-chip shrink-0 text-[10px] sm:text-xs font-bold text-slate-700 bg-white/60 backdrop-blur-md border border-white/20 hover:border-brand hover:text-brand px-5 py-2.5 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 whitespace-nowrap">Phone number?</button>
                         </div>
 
-                        <!-- Add Attachment -->
-                        <label for="fileInput" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full text-slate-500 hover:bg-slate-100 hover:text-brand flex items-center justify-center cursor-pointer transition flex-shrink-0">
-                            <i class="fas fa-paperclip text-sm sm:text-lg"></i>
-                            <input type="file" id="fileInput" class="hidden" accept="image/*,audio/*">
-                        </label>
-                        
-                        <!-- Mic -->
-                        <button class="w-8 h-8 sm:w-10 sm:h-10 rounded-full text-slate-500 hover:bg-slate-100 hover:text-brand flex items-center justify-center transition flex-shrink-0" id="micBtn" title="Record Voice">
-                            <i class="fas fa-microphone text-sm sm:text-lg"></i>
-                        </button>
-                        
-                        <!-- Text Input -->
-                        <input type="text" id="msgInput" placeholder="Message..." class="flex-1 min-w-0 bg-slate-100 border border-slate-200 text-slate-800 text-xs sm:text-sm rounded-full px-3 py-2 sm:px-5 sm:py-3 outline-none focus:ring-2 focus:ring-brand/20 transition focus:bg-white focus:border-brand">
-                        
-                        <!-- Send Button -->
-                        <button class="w-8 h-8 sm:w-10 sm:h-10 md:w-auto md:px-6 rounded-full bg-brand hover:bg-brand-light text-white flex items-center justify-center gap-2 transition flex-shrink-0" id="sendBtn">
-                            <i class="fas fa-paper-plane text-[10px] sm:text-sm"></i>
-                            <span class="hidden md:inline font-bold">Send</span>
-                        </button>
+                        <div class="bg-white/60 backdrop-blur-xl rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/40 p-2 sm:p-3 flex items-center gap-1 sm:gap-2 relative pointer-events-auto">
+                            
+                            <!-- Recording Status Banner -->
+                            <div class="absolute inset-0 bg-white/80 backdrop-blur-xl z-10 hidden items-center justify-between px-6 rounded-[2rem] border border-red-200/50 shadow-sm" id="recordingBar">
+                                <div class="flex items-center gap-3 text-red-500 font-bold text-sm truncate">
+                                    <span class="w-3 h-3 rounded-full bg-red-500 animate-pulse shrink-0"></span>
+                                    <span class="truncate">Recording...</span>
+                                </div>
+                                <button onclick="stopRecording()" class="text-brand font-bold uppercase text-sm tracking-wider hover:underline shrink-0 pl-2">Done</button>
+                            </div>
+
+                            <!-- Add Attachment -->
+                            <label for="fileInput" class="w-10 h-10 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-brand flex items-center justify-center cursor-pointer transition flex-shrink-0">
+                                <i class="fas fa-paperclip text-lg"></i>
+                                <input type="file" id="fileInput" class="hidden" accept="image/*,audio/*">
+                            </label>
+                            
+                            <!-- Mic -->
+                            <button class="w-10 h-10 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-brand flex items-center justify-center transition flex-shrink-0" id="micBtn" title="Record Voice">
+                                <i class="fas fa-microphone text-lg"></i>
+                            </button>
+
+                            <!-- Emoji -->
+                            <div class="relative">
+                                <button type="button" id="emojiBtn" class="w-10 h-10 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-brand flex items-center justify-center transition flex-shrink-0">
+                                    <i class="far fa-smile text-lg"></i>
+                                </button>
+                                <div id="emojiPicker" class="hidden absolute bottom-full left-0 mb-6 bg-white border border-slate-200 rounded-3xl shadow-2xl p-4 z-[60] w-72 grid grid-cols-8 gap-1.5">
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">😊</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">😂</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">❤️</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">😍</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">🤣</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">👍</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">🙏</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">🔥</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">🙌</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">🎉</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">😭</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">😘</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">🤔</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">😎</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">✨</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">💯</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">🌹</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">✅</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">🤝</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">🤩</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">😋</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">😅</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">👋</button>
+                                    <button type="button" class="emoji-item p-1.5 hover:bg-slate-50 rounded-xl transition">⭐</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Text Input -->
+                            <input type="text" id="msgInput" placeholder="Write a message..." class="flex-1 bg-transparent text-slate-800 text-sm sm:text-base px-2 py-3 outline-none transition">
+                            
+                            <!-- Send Button -->
+                            <button class="bg-brand hover:bg-brand-light text-white font-bold py-3 px-6 rounded-[1.5rem] shadow-lg shadow-brand/20 transition flex items-center justify-center gap-2 group flex-shrink-0" id="sendBtn">
+                                <i class="fas fa-paper-plane text-sm group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
+                                <span class="hidden md:inline">Send</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
                     </div>
                 </div>
             </div>
@@ -143,6 +192,7 @@ let isTypingActive = false;
 let isPartnerTyping = false;
 let typingHeartbeatInterval = null;
 let typingShowDelayTimer = null;
+let onlinePollInterval = null;
 const TYPING_SHOW_DELAY_MS = 500;
 
 $(document).ready(function() {
@@ -174,6 +224,31 @@ $(document).ready(function() {
 
     // Mic Button Logic
     $('#micBtn').click(startRecording);
+
+    // Emoji Picker logic
+    $('#emojiBtn').click(function(e) {
+        e.stopPropagation();
+        $('#emojiPicker').toggleClass('hidden');
+    });
+
+    $(document).on('click', '.emoji-item', function() {
+        const emoji = $(this).text();
+        const $input = $('#msgInput');
+        $input.val($input.val() + emoji).focus();
+    });
+
+    $(document).click(function(e) {
+        if (!$(e.target).closest('#emojiPicker, #emojiBtn').length) {
+            $('#emojiPicker').addClass('hidden');
+        }
+    });
+
+    // Suggestions Logic
+    $(document).on('click', '.suggestion-chip', function() {
+        const text = $(this).text();
+        $('#msgInput').val(text);
+        sendTextMessage();
+    });
     
     // Select partner if in URL
     if(urlPartnerId) {
@@ -301,9 +376,14 @@ function openChat(partnerId, partnerName) {
         
         if (pollInterval) clearInterval(pollInterval);
         pollInterval = setInterval(pollNewMessages, 3000);
+        
         pollTypingStatus();
         if (typingPollInterval) clearInterval(typingPollInterval);
         typingPollInterval = setInterval(pollTypingStatus, 1200);
+
+        pollOnlineStatus();
+        if (onlinePollInterval) clearInterval(onlinePollInterval);
+        onlinePollInterval = setInterval(pollOnlineStatus, 5000);
     });
 }
 
@@ -493,13 +573,29 @@ function updateTypingUI(showTyping) {
     isPartnerTyping = showTyping;
     if (showTyping) {
         $('#onlineLabel').addClass('hidden');
+        $('#offlineLabel').addClass('hidden');
         $('#typingIndicator').removeClass('hidden').addClass('flex');
         showTypingBubble();
     } else {
         $('#typingIndicator').addClass('hidden').removeClass('flex');
-        $('#onlineLabel').removeClass('hidden');
+        // Let pollOnlineStatus handle showing the right label
+        pollOnlineStatus();
         removeTypingBubble();
     }
+}
+
+function pollOnlineStatus() {
+    if (!currentPartnerId || isPartnerTyping) return;
+    $.get(`api/messages.php?action=get_online_status&partner_id=${currentPartnerId}`, function(data) {
+        const res = JSON.parse(data);
+        if (res.is_online == 1) {
+            $('#offlineLabel').addClass('hidden');
+            $('#onlineLabel').removeClass('hidden');
+        } else {
+            $('#onlineLabel').addClass('hidden');
+            $('#offlineLabel').removeClass('hidden');
+        }
+    });
 }
 
 function showTypingBubble() {

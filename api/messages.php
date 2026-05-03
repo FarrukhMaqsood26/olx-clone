@@ -148,6 +148,29 @@ if ($action == 'get_typing' && $_SERVER['REQUEST_METHOD'] == 'GET') {
     exit;
 }
 
+// Check if partner is currently online (active in last 30 seconds)
+if ($action == 'get_online_status' && $_SERVER['REQUEST_METHOD'] == 'GET') {
+    $partner_id = intval($_GET['partner_id'] ?? 0);
+
+    if ($partner_id <= 0) {
+        echo json_encode(['status' => 'success', 'is_online' => 0]);
+        exit;
+    }
+
+    $stmt = $pdo->prepare("SELECT last_activity FROM users WHERE id = ?");
+    $stmt->execute([$partner_id]);
+    $last_activity = $stmt->fetchColumn();
+
+    $is_online = 0;
+    if ($last_activity) {
+        $isFresh = (strtotime($last_activity) >= (time() - 30));
+        $is_online = $isFresh ? 1 : 0;
+    }
+
+    echo json_encode(['status' => 'success', 'is_online' => $is_online]);
+    exit;
+}
+
 // 2. Fetch Conversation List (Sidebar)
 if ($action == 'list_conversations') {
     $stmt = $pdo->prepare("

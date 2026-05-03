@@ -1,0 +1,7 @@
+--- NEW POST ATTEMPT 2026-05-02 15:39:31 ---
+FILES KEY: 
+FILES: Array
+(
+)
+
+NO FILES RECEIVED (Tried 'images' and 'images[]')

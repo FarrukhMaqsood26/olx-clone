@@ -388,6 +388,12 @@ include 'includes/header.php';
                 return;
             }
 
+            if (uploadedFiles.length === 0) {
+                e.preventDefault();
+                alert("Please upload at least one photo for your ad. Ads with photos sell much faster!");
+                return;
+            }
+
             // Attach files to FormData manually since we use a custom array
             e.preventDefault();
             const $btn = $(this).find('button[type="submit"]');

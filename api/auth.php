@@ -263,6 +263,54 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['signup'])) {
     exit;
 }
 
+// 1.1 Complete Face Verification (For Google Users or those who skipped)
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['complete_face_verification'])) {
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: ../login.php");
+        exit;
+    }
+    
+    $userId = (int)$_SESSION['user_id'];
+    
+    try {
+        $pdo->beginTransaction();
+        
+        $scan_angles = ['front', 'left', 'right', 'up', 'down'];
+        $landmarks_json = isset($_POST['scan_landmarks']) ? $_POST['scan_landmarks'] : null;
+        $landmarks_array = $landmarks_json ? json_decode($landmarks_json, true) : [];
+
+        foreach ($scan_angles as $angle) {
+            $post_key = "scan_{$angle}_image";
+            if (isset($_POST[$post_key]) && !empty($_POST[$post_key])) {
+                $base64Data = $_POST[$post_key];
+                if (preg_match('/^data:image\/(\w+);base64,/', $base64Data, $type)) {
+                    $data = substr($base64Data, strpos($base64Data, ',') + 1);
+                    $data = base64_decode($data);
+                    
+                    $scan_filename = 'scan_' . $userId . '_' . $angle . '_' . time() . '.jpg';
+                    $scan_dir = '../uploads/face-scans/';
+                    if (!is_dir($scan_dir)) mkdir($scan_dir, 0777, true);
+                    
+                    if (file_put_contents($scan_dir . $scan_filename, $data)) {
+                        $angleLandmarks = isset($landmarks_array[$angle]) ? json_encode($landmarks_array[$angle]) : null;
+                        
+                        $pdo->prepare("
+                            INSERT INTO user_face_scans (user_id, capture_type, image_path, mesh_landmarks_json, capture_angle)
+                            VALUES (?, 'face_mesh', ?, ?, ?)
+                        ")->execute([$userId, $scan_filename, $angleLandmarks, $angle]);
+                    }
+                }
+            }
+        }
+        $pdo->commit();
+        header("Location: ../index.php?success=verified");
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        header("Location: ../face-verify.php?error=verification_failed");
+    }
+    exit;
+}
+
 // ---------------------------------------------------------
 // 2. VERIFY OTP
 // ---------------------------------------------------------
@@ -396,8 +444,17 @@ if ($action == 'google_callback') {
                 $_SESSION['user_role'] = strtolower($user['role']);
             }
             
-            $redirect = ($_SESSION['user_role'] === 'admin') ? "../admin/index.php" : "../index.php";
-            header("Location: $redirect");
+            // Check if user has completed face verification
+            $checkScan = $pdo->prepare("SELECT COUNT(*) FROM user_face_scans WHERE user_id = ?");
+            $checkScan->execute([$_SESSION['user_id']]);
+            $hasScan = $checkScan->fetchColumn();
+
+            if (!$hasScan) {
+                header("Location: ../face-verify.php");
+            } else {
+                $redirect = ($_SESSION['user_role'] === 'admin') ? "../admin/index.php" : "../index.php";
+                header("Location: $redirect");
+            }
             exit;
         }
     }
@@ -516,6 +573,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'reset_password') {
 if ($action == 'logout') {
     session_unset();
     session_destroy();
+    setcookie('recently_viewed', '', time() - 3600, '/');
     header("Location: ../index.php");
     exit;
 }
